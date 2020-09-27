@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/IAP-PJ1.vcxproj.filters
+/IAP-PJ1.vcxproj.user
+/Debug
+/.vs
