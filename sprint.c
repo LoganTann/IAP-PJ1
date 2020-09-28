@@ -19,6 +19,7 @@ Booleen EchoActif = FAUX;
 #define MSG_INTERRUPTION "## fin de programme\n"
 #define MSG_EMBAUCHE "## nouveau travailleur \"%s\" competent pour la specialite \"%s\"\n" 
 #define MSG_TRAVAILLEURS "## consultation des travailleurs competents pour la specialite \"%s\"\n"
+#define MSG_TRAVAILLEURS_TOUS "## consultation des travailleurs competents pour chaque specialite\n"
 #define MSG_DEMARCHE "## nouveau client \"%s\"\n"
 #define MSG_CLIENT "## consultation des commandes effectuees par \"%s\"\n"
 #define MSG_COMMANDE "## nouvelle commande \"%s\", par client \"%s\"\n"
@@ -96,7 +97,10 @@ void traite_embauche() {
 void traite_travailleurs() {
 	Mot specialite;
 	get_id(specialite);
-	printf(MSG_TRAVAILLEURS, specialite);
+	if (strcmp(specialite, "tous") == 0)
+		printf(MSG_TRAVAILLEURS_TOUS);
+	else
+		printf(MSG_TRAVAILLEURS, specialite);
 }
 
 /* 

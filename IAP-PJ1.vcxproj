@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="sprint0.c" />
+    <ClCompile Include="sprint.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
