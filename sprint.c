@@ -22,6 +22,7 @@ Booleen EchoActif = FAUX;
 #define MSG_TRAVAILLEURS_TOUS "## consultation des travailleurs competents pour chaque specialite\n"
 #define MSG_DEMARCHE "## nouveau client \"%s\"\n"
 #define MSG_CLIENT "## consultation des commandes effectuees par \"%s\"\n"
+#define MSG_CLIENT_TOUS "## consultation des commandes effectuees par chaque client\n"
 #define MSG_COMMANDE "## nouvelle commande \"%s\", par client \"%s\"\n"
 #define MSG_SUPERVISION "## consultation de l’avancement des commandes\n"
 #define MSG_TACHE "## la commande \"%s\" requiere la specialite \"%s\" (nombre d’heures \"%d\")\n"
@@ -123,7 +124,10 @@ void traite_demarche() {
 void traite_client() {
 	Mot nom_client;
 	get_id(nom_client);
-	printf(MSG_CLIENT, nom_client);
+	if(strcmp(specialite, "tous") == 0)
+		printf(MSG_CLIENT_TOUS);
+	else
+		printf(MSG_CLIENT, nom_client)
 }
 
 /* 
