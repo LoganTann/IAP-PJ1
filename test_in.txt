@@ -31,6 +31,10 @@ progression superProduit reseau 5
 progression superProduit graphisme 7
 progression produiTop graphisme 21
 progression produiTop reseau 16
+progression superProduit reseau 3 passe
+progression produiTop graphisme 2 passe
+progression superProduit reseau 1
+progression produiTop graphisme 1
 supervision
 charge Toto
 charge Titi

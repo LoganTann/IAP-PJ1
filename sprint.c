@@ -28,6 +28,7 @@ Booleen EchoActif = FAUX;
 #define MSG_TACHE "## la commande \"%s\" requiere la specialite \"%s\" (nombre d’heures \"%d\")\n"
 #define MSG_CHARGE   "## consultation de la charge de travail de \"%s\"\n"
 #define MSG_PROGRESSION "## pour la commande \"%s\", pour la specialite \"%s\" : \"%d\" heures de plus ont ete realisees\n"
+#define MSG_PASSE "## une reallocation est requise\n"
 
 // Lexemes
 
@@ -115,7 +116,6 @@ void traite_demarche() {
 	printf(MSG_DEMARCHE, nom_client);
 }
 
-
 /* 
 * traite_client()
 * client <Mot nom_client>
@@ -189,6 +189,15 @@ void traite_progression() {
 }
 
 /* 
+* traite_passe()
+* passe
+* Traitement des réallocations des dernières progressions
+*/ 
+void traite_passe() {
+	printf(MSG_PASSE);
+}
+
+/* 
 * traite_interruption()
 * interruption
 * Interromp le programme
@@ -249,6 +258,10 @@ int main(int argc, char* argv[]) {
 		}
 		if (strcmp(buffer, "progression") == 0) {
 			traite_progression();
+			continue;
+		}
+		if (strcmp(buffer, "passe") == 0) {
+			traite_passe();
 			continue;
 		}
 		if (strcmp(buffer, "interruption") == 0) {

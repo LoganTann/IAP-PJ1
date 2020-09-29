@@ -26,6 +26,12 @@
 ## pour la commande "superProduit", pour la specialite "graphisme" : "7" heures de plus ont ete realisees
 ## pour la commande "produiTop", pour la specialite "graphisme" : "21" heures de plus ont ete realisees
 ## pour la commande "produiTop", pour la specialite "reseau" : "16" heures de plus ont ete realisees
+## pour la commande "superProduit", pour la specialite "reseau" : "3" heures de plus ont ete realisees
+## une reallocation est requise
+## pour la commande "produiTop", pour la specialite "graphisme" : "2" heures de plus ont ete realisees
+## une reallocation est requise
+## pour la commande "superProduit", pour la specialite "reseau" : "1" heures de plus ont ete realisees
+## pour la commande "produiTop", pour la specialite "graphisme" : "1" heures de plus ont ete realisees
 ## consultation de l’avancement des commandes
 ## consultation de la charge de travail de "Toto"
 ## consultation de la charge de travail de "Titi"
