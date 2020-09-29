@@ -54,3 +54,5 @@ dkms.conf
 /IAP-PJ1.vcxproj.user
 /Debug
 /.vs
+
+.ignore*

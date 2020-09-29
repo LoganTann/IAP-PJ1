@@ -124,10 +124,10 @@ void traite_demarche() {
 void traite_client() {
 	Mot nom_client;
 	get_id(nom_client);
-	if(strcmp(specialite, "tous") == 0)
+	if (strcmp(specialite, "tous") == 0)
 		printf(MSG_CLIENT_TOUS);
 	else
-		printf(MSG_CLIENT, nom_client)
+		printf(MSG_CLIENT, nom_client);
 }
 
 /* 
