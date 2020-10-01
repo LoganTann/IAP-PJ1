@@ -57,9 +57,40 @@ int get_int() {
 	return atoi(buffer);
 }
 
+// Stockage
+
+const enum {
+	SPECIALITE_SIZE = 10,
+	TRAVAILLEURS_SIZE = 50,
+	CLIENTS_SIZE = 100,
+	COMMANDES_SIZE = 500
+};
+
+typedef struct Specialite {
+	Mot name;
+	int cost;
+} Specialite;
+
+Specialite SpecListe[SPECIALITE_SIZE];
+
+// Utils
+
+int insertInSpec(Specialite pSpec) {
+	printf("%s %d\n", pSpec.name, pSpec.cost);
+	int i = 0;
+	for (; i < SPECIALITE_SIZE; ++i) {
+		if (!SpecListe[i].name) {
+			SpecListe[i] = pSpec;
+			printf("%s %d", SpecListe[i].name, SpecListe[i].cost);
+			break;
+		}
+	}
+	return i;
+}
+
 // Commandes
 
-/* 
+/*
 * traite_developpe()
 * developpe <Mot nom_specialite> <int cout_horaire>
 * Ajoute une specialité au programme
@@ -68,7 +99,15 @@ void traite_developpe() {
 	Mot nom_specialite;
 	get_id(nom_specialite);
 	int cout_horaire = get_int();
-	printf(MSG_DEVELOPPE, nom_specialite, cout_horaire);
+
+	// printf(MSG_DEVELOPPE, nom_specialite, cout_horaire);
+
+	Specialite spec;
+	strcpy(spec.name, nom_specialite);
+	spec.cost = cout_horaire;
+
+	int insertedAt = insertInSpec(spec);
+	printf("%d %s %d\n", insertedAt, spec.name, spec.cost);
 }
 
 /* 
@@ -78,6 +117,12 @@ void traite_developpe() {
 */ 
 void traite_specialites() {
 	printf(MSG_SPECIALITES);
+
+	for (int i = 0; i < SPECIALITE_SIZE; ++i) {
+		if (SpecListe[i].name != NULL) {
+			printf("%s %d\n", SpecListe[i].name, SpecListe[i].cost);
+		}
+	}
 }
 
 /*
