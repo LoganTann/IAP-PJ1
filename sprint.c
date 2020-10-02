@@ -15,14 +15,10 @@ Booleen EchoActif = FAUX;
 // Messages emis par les instructions
 
 #define MSG_DEVELOPPE "## nouvelle specialite \"%s\" ; cout horaire \"%d\"\n" 
-#define MSG_SPECIALITES "## consultation des specialites\n" 
+#define MSG_SPECIALITES "specialites traitees : " 
 #define MSG_INTERRUPTION "## fin de programme\n"
-#define MSG_EMBAUCHE "## nouveau travailleur \"%s\" competent pour la specialite \"%s\"\n" 
-#define MSG_TRAVAILLEURS "## consultation des travailleurs competents pour la specialite \"%s\"\n"
-#define MSG_TRAVAILLEURS_TOUS "## consultation des travailleurs competents pour chaque specialite\n"
-#define MSG_DEMARCHE "## nouveau client \"%s\"\n"
-#define MSG_CLIENT "## consultation des commandes effectuees par \"%s\"\n"
-#define MSG_CLIENT_TOUS "## consultation des commandes effectuees par chaque client\n"
+#define MSG_TRAVAILLEURS "la specialite %s peut etre prise en charge par : "
+#define MSG_CLIENT "le client %s a commande : "
 #define MSG_COMMANDE "## nouvelle commande \"%s\", par client \"%s\"\n"
 #define MSG_SUPERVISION "## consultation de l’avancement des commandes\n"
 #define MSG_TACHE "## la commande \"%s\" requiere la specialite \"%s\" (nombre d’heures \"%d\")\n"
@@ -41,7 +37,7 @@ typedef char Mot[LGMOT + 1]; // Définition du type Mot
 	void get_id
 	@param id Mot: 
 **/
-void get_id(Mot id) {
+void get_id(Mot* id) {
 	scanf("%s", id);
 	if (EchoActif) printf(">>echo %s\n", id);
 }
@@ -66,27 +62,35 @@ const enum {
 	COMMANDES_SIZE = 500
 };
 
-typedef struct Specialite {
-	Mot name;
-	int cost;
-} Specialite;
+typedef struct {
+	Mot nom[SPECIALITE_SIZE];
+	int cout_horaire[SPECIALITE_SIZE];
+	int inserted;
+} TableauSpecialite;
 
-Specialite SpecListe[SPECIALITE_SIZE];
+typedef struct {
+	Mot nom[TRAVAILLEURS_SIZE];
+	Mot specialite[TRAVAILLEURS_SIZE];
+	int inserted;
+} TableauTravailleurs;
 
-// Utils
+typedef struct {
+	Mot nom[CLIENTS_SIZE];
+	int inserted;
+} TableauClients;
 
-int insertInSpec(Specialite pSpec) {
-	printf("%s %d\n", pSpec.name, pSpec.cost);
-	int i = 0;
-	for (; i < SPECIALITE_SIZE; ++i) {
-		if (!SpecListe[i].name) {
-			SpecListe[i] = pSpec;
-			printf("%s %d", SpecListe[i].name, SpecListe[i].cost);
-			break;
-		}
-	}
-	return i;
-}
+typedef struct {
+	Mot produit[COMMANDES_SIZE];
+	Mot client[COMMANDES_SIZE];
+	int inserted;
+} TableauCommandes;
+
+typedef struct {
+	TableauSpecialite specialites;
+	TableauTravailleurs travailleurs;
+	TableauClients clients;
+	TableauCommandes commandes;
+} Stockage;
 
 // Commandes
 
@@ -95,19 +99,16 @@ int insertInSpec(Specialite pSpec) {
 * developpe <Mot nom_specialite> <int cout_horaire>
 * Ajoute une specialité au programme
 */
-void traite_developpe() {
+void traite_developpe(Stockage* store) {
 	Mot nom_specialite;
-	get_id(nom_specialite);
+	get_id(&nom_specialite);
 	int cout_horaire = get_int();
 
-	// printf(MSG_DEVELOPPE, nom_specialite, cout_horaire);
-
-	Specialite spec;
-	strcpy(spec.name, nom_specialite);
-	spec.cost = cout_horaire;
-
-	int insertedAt = insertInSpec(spec);
-	printf("%d %s %d\n", insertedAt, spec.name, spec.cost);
+	if (store->specialites.inserted < SPECIALITE_SIZE) {
+		strcpy(store->specialites.nom[store->specialites.inserted], &nom_specialite);
+		store->specialites.cout_horaire[store->specialites.inserted] = cout_horaire;
+		store->specialites.inserted++;
+	}
 }
 
 /* 
@@ -115,25 +116,34 @@ void traite_developpe() {
 * specialites
 * Affiche les specialités enregistrées dans le programme
 */ 
-void traite_specialites() {
+void traite_specialites(Stockage* store) {
 	printf(MSG_SPECIALITES);
 
-	for (int i = 0; i < SPECIALITE_SIZE; ++i) {
-		if (SpecListe[i].name != NULL) {
-			printf("%s %d\n", SpecListe[i].name, SpecListe[i].cost);
-		}
+	for (int i = 0; i < store->specialites.inserted; ++i) {
+		if (i == 0)
+			printf("%s/%d", store->specialites.nom[i], store->specialites.cout_horaire[i]);
+		else
+			printf(", %s/%d", store->specialites.nom[i], store->specialites.cout_horaire[i]);
 	}
+
+	printf("\n");
 }
 
 /*
 * traite_embauche() : traite les arguments de la commande suivante : 
 * embauche <Mot travailleur> <Mot specialite>
 */
-void traite_embauche() {
+void traite_embauche(Stockage* store) {
 	Mot travailleur, specialite;
-	get_id(travailleur);
-	get_id(specialite);
-	printf(MSG_EMBAUCHE, travailleur, specialite);
+	get_id(&travailleur);
+	get_id(&specialite);
+	//printf(MSG_EMBAUCHE, travailleur, specialite);
+	
+	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
+		strcpy(store->travailleurs.nom[store->travailleurs.inserted], &travailleur);
+		strcpy(store->travailleurs.specialite[store->travailleurs.inserted], &specialite);
+		store->travailleurs.inserted++;
+	}
 }
 
 /* 
@@ -141,13 +151,38 @@ void traite_embauche() {
 * travailleurs <Mot specialite = "tous">
 * Affiche les travailleurs selon la specialité choisie ou non
 */ 
-void traite_travailleurs() {
+void traite_travailleurs(Stockage* store) {
 	Mot specialite;
-	get_id(specialite);
-	if (strcmp(specialite, "tous") == 0)
-		printf(MSG_TRAVAILLEURS_TOUS);
-	else
+	get_id(&specialite);
+	if (strcmp(specialite, "tous") == 0) {
+		for (int specialitesI = 0; specialitesI < store->specialites.inserted; ++specialitesI) {
+			printf(MSG_TRAVAILLEURS, store->specialites.nom[specialitesI]);
+			int passedCheck = 0;
+			for (int travailleursI = 0; travailleursI < store->travailleurs.inserted; ++travailleursI) {
+				if (strcmp(store->travailleurs.specialite[travailleursI], store->specialites.nom[specialitesI]) == 0) {
+					if (passedCheck == 0)
+						printf("%s", store->travailleurs.nom[travailleursI]);
+					else
+						printf(", %s", store->travailleurs.nom[travailleursI]);
+					passedCheck++;
+				}
+			}
+			printf("\n");
+		}
+	} else {
 		printf(MSG_TRAVAILLEURS, specialite);
+		int passedCheck = 0;
+		for (int i = 0; i < store->travailleurs.inserted; ++i) {
+			if (strcmp(store->travailleurs.specialite[i], specialite) == 0) {
+				if (passedCheck == 0)
+					printf("%s", store->travailleurs.nom[i]);
+				else
+					printf(", %s", store->travailleurs.nom[i]);
+				passedCheck++;
+			}
+		}
+		printf("\n");
+	}
 }
 
 /* 
@@ -155,10 +190,14 @@ void traite_travailleurs() {
 * demarche <Mot nom_client>
 * Ajoute un client au programme
 */ 
-void traite_demarche() {
+void traite_demarche(Stockage* store) {
 	Mot nom_client;
-	get_id(nom_client);
-	printf(MSG_DEMARCHE, nom_client);
+	get_id(&nom_client);
+	
+	if (store->clients.inserted < CLIENTS_SIZE) {
+		strcpy(store->clients.nom[store->clients.inserted], &nom_client);
+		store->clients.inserted++;
+	}
 }
 
 /* 
@@ -166,13 +205,38 @@ void traite_demarche() {
 * client <Mot nom_client>
 * Affiche les commandes d'un client
 */ 
-void traite_client() {
+void traite_client(Stockage* store) {
 	Mot nom_client;
-	get_id(nom_client);
-	if (strcmp(nom_client, "tous") == 0)
-		printf(MSG_CLIENT_TOUS);
-	else
+	get_id(&nom_client);
+	if (strcmp(nom_client, "tous") == 0) {
+		for (int clientsI = 0; clientsI < store->clients.inserted; ++clientsI) {
+			printf(MSG_CLIENT, store->clients.nom[clientsI]);
+			int passedCheck = 0;
+			for (int commandesI = 0; commandesI < store->commandes.inserted; ++commandesI) {
+				if (strcmp(store->commandes.client[commandesI], store->clients.nom[clientsI]) == 0) {
+					if (passedCheck == 0)
+						printf("%s", store->commandes.produit[commandesI]);
+					else
+						printf(", %s", store->commandes.produit[commandesI]);
+					passedCheck++;
+				}
+			}
+			printf("\n");
+		}
+	} else {
 		printf(MSG_CLIENT, nom_client);
+		int passedCheck = 0;
+		for (int i = 0; i < store->commandes.inserted; ++i) {
+			if (strcmp(store->commandes.client[i], nom_client) == 0) {
+				if (passedCheck == 0)
+					printf("%s", store->commandes.produit[i]);
+				else
+					printf(", %s", store->commandes.produit[i]);
+				passedCheck++;
+			}
+		}
+		printf("\n");
+	}
 }
 
 /* 
@@ -180,10 +244,10 @@ void traite_client() {
 * commande <Mot produit> <Mot nom_client>
 * Ajoute une commande au programme
 */ 
-void traite_commande() {
+void traite_commande(Stockage* store) {
 	Mot produit, nom_client;
-	get_id(produit);
-	get_id(nom_client);
+	get_id(&produit);
+	get_id(&nom_client);
 	printf(MSG_COMMANDE, produit, nom_client);
 }
 
@@ -192,7 +256,7 @@ void traite_commande() {
 * supervision
 * Affiche l'avancement actuel des commandes
 */
-void traite_supervision() {
+void traite_supervision(Stockage* store) {
 	printf(MSG_SUPERVISION);
 }
 
@@ -201,10 +265,10 @@ void traite_supervision() {
 * tache <Mot produit> <Mot specialite> <int heures>
 * Ajoute une specialité ainsi que le nombre d'heures requises à une commande
 */ 
-void traite_tache() {
+void traite_tache(Stockage* store) {
 	Mot produit, nom_client;
-	get_id(produit);
-	get_id(nom_client);
+	get_id(&produit);
+	get_id(&nom_client);
 	int heures = get_int();
 	printf(MSG_TACHE, produit, nom_client, heures);
 }
@@ -214,9 +278,9 @@ void traite_tache() {
 * charge <Mot nom_travailleur>
 * A
 */
-void traite_charge() {
+void traite_charge(Stockage* store) {
 	Mot nom_travailleur;
-	get_id(nom_travailleur);
+	get_id(&nom_travailleur);
 	printf(MSG_CHARGE, nom_travailleur);
 }
 
@@ -225,10 +289,10 @@ void traite_charge() {
 * tache <Mot produit> <Mot specialite> <int heures_travaillees>
 * Enregistre une progression aux seins d'une specialité d'une commande
 */ 
-void traite_progression() {
+void traite_progression(Stockage* store) {
 	Mot produit, nom_client;
-	get_id(produit);
-	get_id(nom_client);
+	get_id(&produit);
+	get_id(&nom_client);
 	int heures_travaillees = get_int();
 	printf(MSG_PROGRESSION, produit, nom_client, heures_travaillees);
 }
@@ -258,51 +322,58 @@ int main(int argc, char* argv[]) {
 		EchoActif = VRAI;
 	}
 	setlocale(LC_ALL, "fr-FR");
+
+	Stockage globalStore;
+	globalStore.specialites.inserted = 0;
+	globalStore.travailleurs.inserted = 0;
+	globalStore.clients.inserted = 0;
+	globalStore.commandes.inserted = 0;
+
 	Mot buffer;
 	while (VRAI) {
-		get_id(buffer);
+		get_id(&buffer);
 		if (strcmp(buffer, "developpe") == 0) {
-			traite_developpe();
+			traite_developpe(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "specialites") == 0) {
-			traite_specialites();
+			traite_specialites(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "embauche") == 0) {
-			traite_embauche();
+			traite_embauche(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "travailleurs") == 0) {
-			traite_travailleurs();
+			traite_travailleurs(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "demarche") == 0) {
-			traite_demarche();
+			traite_demarche(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "client") == 0) {
-			traite_client();
+			traite_client(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "commande") == 0) {
-			traite_commande();
+			traite_commande(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "supervision") == 0) {
-			traite_supervision();
+			traite_supervision(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "tache") == 0) {
-			traite_tache();
+			traite_tache(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "charge") == 0) {
-			traite_charge();
+			traite_charge(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "progression") == 0) {
-			traite_progression();
+			traite_progression(&globalStore);
 			continue;
 		}
 		if (strcmp(buffer, "passe") == 0) {
