@@ -70,7 +70,8 @@ typedef struct {
 
 typedef struct {
 	Mot nom[TRAVAILLEURS_SIZE];
-	Mot specialite[TRAVAILLEURS_SIZE];
+	Mot specialite[TRAVAILLEURS_SIZE][10];
+	int insertedTravailleurs[TRAVAILLEURS_SIZE];
 	int inserted;
 } TableauTravailleurs;
 
@@ -140,8 +141,11 @@ void traite_embauche(Stockage* store) {
 	//printf(MSG_EMBAUCHE, travailleur, specialite);
 	
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
+		if (store->travailleurs.insertedTravailleurs[store->travailleurs.inserted] < 0)
+			store->travailleurs.insertedTravailleurs[store->travailleurs.inserted] = 0;
 		strcpy(store->travailleurs.nom[store->travailleurs.inserted], &travailleur);
-		strcpy(store->travailleurs.specialite[store->travailleurs.inserted], &specialite);
+		strcpy(store->travailleurs.specialite[store->travailleurs.inserted][store->travailleurs.insertedTravailleurs[store->travailleurs.inserted]], &specialite);
+		store->travailleurs.insertedTravailleurs[store->travailleurs.inserted]++;
 		store->travailleurs.inserted++;
 	}
 }
@@ -158,7 +162,7 @@ void traite_travailleurs(Stockage* store) {
 		for (int specialitesI = 0; specialitesI < store->specialites.inserted; ++specialitesI) {
 			printf(MSG_TRAVAILLEURS, store->specialites.nom[specialitesI]);
 			int passedCheck = 0;
-			for (int travailleursI = 0; travailleursI < store->travailleurs.inserted; ++travailleursI) {
+			for (int travailleursI = store->travailleurs.inserted; travailleursI > 0; --travailleursI) {
 				if (strcmp(store->travailleurs.specialite[travailleursI], store->specialites.nom[specialitesI]) == 0) {
 					if (passedCheck == 0)
 						printf("%s", store->travailleurs.nom[travailleursI]);
@@ -172,13 +176,15 @@ void traite_travailleurs(Stockage* store) {
 	} else {
 		printf(MSG_TRAVAILLEURS, specialite);
 		int passedCheck = 0;
-		for (int i = 0; i < store->travailleurs.inserted; ++i) {
-			if (strcmp(store->travailleurs.specialite[i], specialite) == 0) {
-				if (passedCheck == 0)
-					printf("%s", store->travailleurs.nom[i]);
-				else
-					printf(", %s", store->travailleurs.nom[i]);
-				passedCheck++;
+		for (int travailleursI = store->travailleurs.inserted; travailleursI > 0; --travailleursI) {
+			for (int specialitesTravailleursI = 0; specialitesTravailleursI < store->travailleurs.insertedTravailleurs[travailleursI]; ++specialitesTravailleursI) {
+				if (strcmp(store->travailleurs.specialite[travailleursI][specialitesTravailleursI], specialite) == 0) {
+					if (passedCheck == 0)
+						printf("%s", store->travailleurs.nom[travailleursI]);
+					else
+						printf(", %s", store->travailleurs.nom[travailleursI]);
+					passedCheck++;
+				}
 			}
 		}
 		printf("\n");
