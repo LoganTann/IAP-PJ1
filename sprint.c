@@ -32,7 +32,7 @@ Booleen EchoActif = FAUX;
 #define LGMOT 35
 #define NBCHIFFREMAX 5 
 #define MAX_COMMANDES 500
-
+#define MAX_SPECIALITES 10
 typedef char Mot[LGMOT + 1]; // Définition du type Mot
 
 /**
@@ -80,7 +80,7 @@ typedef struct {
 
 typedef struct {
 	Mot nom;
-	Mot specialites[10];
+	Mot specialites[MAX_SPECIALITES];
 	int insertedSpecialites;
 } Travailleur;
 
@@ -128,6 +128,25 @@ typedef struct {
 	Commandes commandes;
 } Stockage;
 
+// Helpers
+
+int getIndex_cmd(Commandes* commandes, Mot nom_produit) {
+	for (unsigned int i = 0; i < commandes->inserted; i++) {
+		if (strcmp(commandes->table[i].produit, nom_produit) == 0) {
+			return i;
+		}
+	}
+	return 0; //fallback
+}
+
+int getIndex_spe(Specialites* specialites, Mot nom) {
+	for (unsigned int i = 0; i < specialites->inserted; i++) {
+		if (strcmp(specialites->table[i].nom, nom) == 0) {
+			return i;
+		}
+	}
+	return 0; //fallback
+}
 // Commandes
 
 /*
@@ -302,7 +321,12 @@ void traite_commande(Stockage* store) {
 	strcpy(store->commandes.table[i].nom_client, &nom_client);
 	strcpy(store->commandes.table[i].produit, &produit);
 
-	printf(MSG_COMMANDE, produit, nom_client);
+	//intialisation de la liste de tâches
+	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; speNbr++)
+	{
+		store->commandes.table[speNbr].liste_taches[speNbr].nb_heures_requises = 0;
+	}
+	
 }
 
 /*
@@ -316,15 +340,23 @@ void traite_supervision(Stockage* store) {
 
 /*
 * traite_tache()
-* tache <Mot produit> <Mot specialite> <int heures>
+* tache <Mot commande> <Mot specialite> <int heures>
 * Ajoute une specialité ainsi que le nombre d'heures requises à une commande
 */
 void traite_tache(Stockage* store) {
-	Mot produit, nom_client;
-	get_id(&produit);
-	get_id(&nom_client);
+	Mot commande, specialite;
+	get_id(&commande);
+	get_id(&specialite);
 	int heures = get_int();
-	printf(MSG_TACHE, produit, nom_client, heures);
+
+	// recherche de la commande concernée puis de la spécialité concernée
+	const unsigned int cmd_i = getIndex_cmd(&store->commandes, commande);
+	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
+	// initialisation de la tâche pour la commande en question
+	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
+
+	printf(MSG_TACHE, commande, specialite, 
+			store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises);
 }
 
 /*
