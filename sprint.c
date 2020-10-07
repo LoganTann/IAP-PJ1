@@ -340,7 +340,7 @@ void traite_progression(Stockage* store) {
 * Traitement des réallocations des dernières progressions
 */
 void traite_passe() {
-	printf(MSG_PASSE);
+	//printf(MSG_PASSE);
 }
 
 /*
