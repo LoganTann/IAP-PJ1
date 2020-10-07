@@ -31,6 +31,7 @@ Booleen EchoActif = FAUX;
 
 #define LGMOT 35
 #define NBCHIFFREMAX 5 
+#define MAX_COMMANDES 500
 
 typedef char Mot[LGMOT + 1]; // Définition du type Mot
 
@@ -99,17 +100,24 @@ typedef struct {
 	int inserted;
 } Clients;
 
-// Commande
+// Commande et taches
+
+typedef  struct {
+	unsigned int nb_heures_requises;
+	unsigned int nb_heures_effectuees;
+} Tache;
 
 typedef struct {
 	Mot produit;
-	Mot client;
+	Mot nom_client;
+	Tache liste_taches[SPECIALITE_SIZE];
 } Commande;
 
 typedef struct {
 	Commande table[COMMANDES_SIZE];
 	int inserted;
 } Commandes;
+
 
 // Stockage global
 
@@ -249,7 +257,7 @@ void traite_client(Stockage* store) {
 			printf(MSG_CLIENT, store->clients.table[clientsI].nom);
 			int passedCheck = 0;
 			for (int commandesI = 0; commandesI < store->commandes.inserted; ++commandesI) {
-				if (strcmp(store->commandes.table[commandesI].client, store->clients.table[clientsI].nom) == 0) {
+				if (strcmp(store->commandes.table[commandesI].nom_client, store->clients.table[clientsI].nom) == 0) {
 					if (passedCheck == 0)
 						printf("%s", store->commandes.table[commandesI].produit);
 					else
@@ -262,9 +270,13 @@ void traite_client(Stockage* store) {
 	}
 	else {
 		printf(MSG_CLIENT, nom_client);
+
+		const unsigned int newIndex = store->clients.inserted++; // incrémentation + stockage de l'ancien
+		strcpy(store->clients.table[newIndex].nom, &nom_client);
+
 		int passedCheck = 0;
 		for (int i = 0; i < store->commandes.inserted; ++i) {
-			if (strcmp(store->commandes.table[i].client, nom_client) == 0) {
+			if (strcmp(store->commandes.table[i].nom_client, nom_client) == 0) {
 				if (passedCheck == 0)
 					printf("%s", store->commandes.table[i].produit);
 				else
@@ -285,6 +297,11 @@ void traite_commande(Stockage* store) {
 	Mot produit, nom_client;
 	get_id(&produit);
 	get_id(&nom_client);
+
+	const unsigned int i = store->commandes.inserted++; // stockage puis incrémentation
+	strcpy(store->commandes.table[i].nom_client, &nom_client);
+	strcpy(store->commandes.table[i].produit, &produit);
+
 	printf(MSG_COMMANDE, produit, nom_client);
 }
 
