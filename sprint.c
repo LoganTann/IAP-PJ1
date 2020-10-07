@@ -1,6 +1,7 @@
 /*
-	sprint1.c
-
+	sprint.c
+	@author JiveOff (Antoine Banha - antoine@jiveoff.fr)
+	@author ShinProg (Logan Tann - logon313@hotmail.fr)
 */
 
 #pragma warning(disable:4996)
@@ -62,35 +63,61 @@ const enum {
 	COMMANDES_SIZE = 500
 };
 
-typedef struct {
-	Mot nom[SPECIALITE_SIZE];
-	int cout_horaire[SPECIALITE_SIZE];
-	int inserted;
-} TableauSpecialite;
+// Specialité
 
 typedef struct {
-	Mot nom[TRAVAILLEURS_SIZE];
-	Mot specialite[TRAVAILLEURS_SIZE][10];
-	int insertedTravailleurs[TRAVAILLEURS_SIZE];
-	int inserted;
-} TableauTravailleurs;
+	Mot nom;
+	int cout_horaire;
+} Specialite;
 
 typedef struct {
-	Mot nom[CLIENTS_SIZE];
+	Specialite table[SPECIALITE_SIZE];
 	int inserted;
-} TableauClients;
+} Specialites;
+
+// Travailleurs
 
 typedef struct {
-	Mot produit[COMMANDES_SIZE];
-	Mot client[COMMANDES_SIZE];
-	int inserted;
-} TableauCommandes;
+	Mot nom;
+	Mot specialites[10];
+	int insertedSpecialites;
+} Travailleur;
 
 typedef struct {
-	TableauSpecialite specialites;
-	TableauTravailleurs travailleurs;
-	TableauClients clients;
-	TableauCommandes commandes;
+	Travailleur table[TRAVAILLEURS_SIZE];
+	int inserted;
+} Travailleurs;
+
+// Client
+
+typedef struct {
+	Mot nom;
+} Client;
+
+typedef struct {
+	Client table[CLIENTS_SIZE];
+	int inserted;
+} Clients;
+
+// Commande
+
+typedef struct {
+	Mot produit;
+	Mot client;
+} Commande;
+
+typedef struct {
+	Commande table[COMMANDES_SIZE];
+	int inserted;
+} Commandes;
+
+// Stockage global
+
+typedef struct {
+	Specialites specialites;
+	Travailleurs travailleurs;
+	Clients clients;
+	Commandes commandes;
 } Stockage;
 
 // Commandes
@@ -106,8 +133,8 @@ void traite_developpe(Stockage* store) {
 	int cout_horaire = get_int();
 
 	if (store->specialites.inserted < SPECIALITE_SIZE) {
-		strcpy(store->specialites.nom[store->specialites.inserted], &nom_specialite);
-		store->specialites.cout_horaire[store->specialites.inserted] = cout_horaire;
+		strcpy(store->specialites.table[store->specialites.inserted].nom, &nom_specialite);
+		store->specialites.table[store->specialites.inserted].cout_horaire = cout_horaire;
 		store->specialites.inserted++;
 	}
 }
@@ -122,9 +149,9 @@ void traite_specialites(Stockage* store) {
 
 	for (int i = 0; i < store->specialites.inserted; ++i) {
 		if (i == 0)
-			printf("%s/%d", store->specialites.nom[i], store->specialites.cout_horaire[i]);
+			printf("%s/%d", store->specialites.table[i].nom, store->specialites.table[i].cout_horaire);
 		else
-			printf(", %s/%d", store->specialites.nom[i], store->specialites.cout_horaire[i]);
+			printf(", %s/%d", store->specialites.table[i].nom, store->specialites.table[i].cout_horaire);
 	}
 
 	printf("\n");
@@ -141,11 +168,11 @@ void traite_embauche(Stockage* store) {
 	//printf(MSG_EMBAUCHE, travailleur, specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		if (store->travailleurs.insertedTravailleurs[store->travailleurs.inserted] < 0)
-			store->travailleurs.insertedTravailleurs[store->travailleurs.inserted] = 0;
-		strcpy(store->travailleurs.nom[store->travailleurs.inserted], &travailleur);
-		strcpy(store->travailleurs.specialite[store->travailleurs.inserted][store->travailleurs.insertedTravailleurs[store->travailleurs.inserted]], &specialite);
-		store->travailleurs.insertedTravailleurs[store->travailleurs.inserted]++;
+		if (store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites < 0)
+			store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites = 0;
+		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, &travailleur);
+		strcpy(store->travailleurs.table[store->travailleurs.inserted].specialites[store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites], &specialite);
+		store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites++;
 		store->travailleurs.inserted++;
 	}
 }
@@ -160,15 +187,15 @@ void traite_travailleurs(Stockage* store) {
 	get_id(&specialite);
 	if (strcmp(specialite, "tous") == 0) {
 		for (int specialitesI = 0; specialitesI < store->specialites.inserted; ++specialitesI) {
-			printf(MSG_TRAVAILLEURS, store->specialites.nom[specialitesI]);
+			printf(MSG_TRAVAILLEURS, store->specialites.table[specialitesI].nom);
 			int passedCheck = 0;
 			for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
-				for (int subSpecialiteI = 0; subSpecialiteI < store->travailleurs.insertedTravailleurs[travailleursI]; ++subSpecialiteI) {
-					if (strcmp(store->travailleurs.specialite[travailleursI][subSpecialiteI], store->specialites.nom[specialitesI]) == 0) {
+				for (int subSpecialiteI = 0; subSpecialiteI < store->travailleurs.table[travailleursI].insertedSpecialites; ++subSpecialiteI) {
+					if (strcmp(store->travailleurs.table[travailleursI].specialites[subSpecialiteI], store->specialites.table[specialitesI].nom) == 0) {
 						if (passedCheck == 0)
-							printf("%s", store->travailleurs.nom[travailleursI]);
+							printf("%s", store->travailleurs.table[travailleursI].nom);
 						else
-							printf(", %s", store->travailleurs.nom[travailleursI]);
+							printf(", %s", store->travailleurs.table[travailleursI].nom);
 						passedCheck++;
 					}
 				}
@@ -180,12 +207,12 @@ void traite_travailleurs(Stockage* store) {
 		printf(MSG_TRAVAILLEURS, specialite);
 		int passedCheck = 0;
 		for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
-			for (int specialitesTravailleursI = 0; specialitesTravailleursI < store->travailleurs.insertedTravailleurs[travailleursI]; ++specialitesTravailleursI) {
-				if (strcmp(store->travailleurs.specialite[travailleursI][specialitesTravailleursI], specialite) == 0) {
+			for (int specialitesTravailleursI = 0; specialitesTravailleursI < store->travailleurs.table[travailleursI].insertedSpecialites; ++specialitesTravailleursI) {
+				if (strcmp(store->travailleurs.table[travailleursI].specialites[specialitesTravailleursI], specialite) == 0) {
 					if (passedCheck == 0)
-						printf("%s", store->travailleurs.nom[travailleursI]);
+						printf("%s", store->travailleurs.table[travailleursI].nom);
 					else
-						printf(", %s", store->travailleurs.nom[travailleursI]);
+						printf(", %s", store->travailleurs.table[travailleursI].nom);
 					passedCheck++;
 				}
 			}
@@ -204,7 +231,7 @@ void traite_demarche(Stockage* store) {
 	get_id(&nom_client);
 
 	if (store->clients.inserted < CLIENTS_SIZE) {
-		strcpy(store->clients.nom[store->clients.inserted], &nom_client);
+		strcpy(store->clients.table[store->clients.inserted].nom, &nom_client);
 		store->clients.inserted++;
 	}
 }
@@ -219,14 +246,14 @@ void traite_client(Stockage* store) {
 	get_id(&nom_client);
 	if (strcmp(nom_client, "tous") == 0) {
 		for (int clientsI = 0; clientsI < store->clients.inserted; ++clientsI) {
-			printf(MSG_CLIENT, store->clients.nom[clientsI]);
+			printf(MSG_CLIENT, store->clients.table[clientsI].nom);
 			int passedCheck = 0;
 			for (int commandesI = 0; commandesI < store->commandes.inserted; ++commandesI) {
-				if (strcmp(store->commandes.client[commandesI], store->clients.nom[clientsI]) == 0) {
+				if (strcmp(store->commandes.table[commandesI].client, store->clients.table[clientsI].nom) == 0) {
 					if (passedCheck == 0)
-						printf("%s", store->commandes.produit[commandesI]);
+						printf("%s", store->commandes.table[commandesI].produit);
 					else
-						printf(", %s", store->commandes.produit[commandesI]);
+						printf(", %s", store->commandes.table[commandesI].produit);
 					passedCheck++;
 				}
 			}
@@ -237,11 +264,11 @@ void traite_client(Stockage* store) {
 		printf(MSG_CLIENT, nom_client);
 		int passedCheck = 0;
 		for (int i = 0; i < store->commandes.inserted; ++i) {
-			if (strcmp(store->commandes.client[i], nom_client) == 0) {
+			if (strcmp(store->commandes.table[i].client, nom_client) == 0) {
 				if (passedCheck == 0)
-					printf("%s", store->commandes.produit[i]);
+					printf("%s", store->commandes.table[i].produit);
 				else
-					printf(", %s", store->commandes.produit[i]);
+					printf(", %s", store->commandes.table[i].produit);
 				passedCheck++;
 			}
 		}
