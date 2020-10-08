@@ -80,8 +80,7 @@ typedef struct {
 
 typedef struct {
 	Mot nom;
-	Mot specialites[MAX_SPECIALITES];
-	int insertedSpecialites;
+	Booleen tag_specialite[SPECIALITE_SIZE];
 } Travailleur;
 
 typedef struct {
@@ -188,6 +187,10 @@ void traite_specialites(Stockage* store) {
 * traite_embauche() : traite les arguments de la commande suivante :
 * embauche <Mot travailleur> <Mot specialite>
 */
+/*
+* traite_embauche() : traite les arguments de la commande suivante :
+* embauche <Mot travailleur> <Mot specialite>
+*/
 void traite_embauche(Stockage* store) {
 	Mot travailleur, specialite;
 	get_id(&travailleur);
@@ -195,11 +198,9 @@ void traite_embauche(Stockage* store) {
 	//printf(MSG_EMBAUCHE, travailleur, specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		if (store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites < 0)
-			store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites = 0;
 		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, &travailleur);
-		strcpy(store->travailleurs.table[store->travailleurs.inserted].specialites[store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites], &specialite);
-		store->travailleurs.table[store->travailleurs.inserted].insertedSpecialites++;
+		int indexSpe = getIndex_spe(&store->specialites, specialite);
+		store->travailleurs.table[store->travailleurs.inserted].tag_specialite[indexSpe] = VRAI;
 		store->travailleurs.inserted++;
 	}
 }
@@ -217,14 +218,12 @@ void traite_travailleurs(Stockage* store) {
 			printf(MSG_TRAVAILLEURS, store->specialites.table[specialitesI].nom);
 			int passedCheck = 0;
 			for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
-				for (int subSpecialiteI = 0; subSpecialiteI < store->travailleurs.table[travailleursI].insertedSpecialites; ++subSpecialiteI) {
-					if (strcmp(store->travailleurs.table[travailleursI].specialites[subSpecialiteI], store->specialites.table[specialitesI].nom) == 0) {
-						if (passedCheck == 0)
-							printf("%s", store->travailleurs.table[travailleursI].nom);
-						else
-							printf(", %s", store->travailleurs.table[travailleursI].nom);
-						passedCheck++;
-					}
+				if (store->travailleurs.table[travailleursI].tag_specialite[specialitesI] == VRAI) {
+					if (passedCheck == 0)
+						printf("%s", store->travailleurs.table[travailleursI].nom);
+					else
+						printf(", %s", store->travailleurs.table[travailleursI].nom);
+					passedCheck++;
 				}
 			}
 			printf("\n");
@@ -232,16 +231,15 @@ void traite_travailleurs(Stockage* store) {
 	}
 	else {
 		printf(MSG_TRAVAILLEURS, specialite);
+		int indexSpe = getIndex_spe(&store->specialites, specialite);
 		int passedCheck = 0;
 		for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
-			for (int specialitesTravailleursI = 0; specialitesTravailleursI < store->travailleurs.table[travailleursI].insertedSpecialites; ++specialitesTravailleursI) {
-				if (strcmp(store->travailleurs.table[travailleursI].specialites[specialitesTravailleursI], specialite) == 0) {
-					if (passedCheck == 0)
-						printf("%s", store->travailleurs.table[travailleursI].nom);
-					else
-						printf(", %s", store->travailleurs.table[travailleursI].nom);
-					passedCheck++;
-				}
+			if (store->travailleurs.table[travailleursI].tag_specialite[indexSpe] == VRAI) {
+				if (passedCheck == 0)
+					printf("%s", store->travailleurs.table[travailleursI].nom);
+				else
+					printf(", %s", store->travailleurs.table[travailleursI].nom);
+				passedCheck++;
 			}
 		}
 		printf("\n");
@@ -321,7 +319,7 @@ void traite_commande(Stockage* store) {
 	strcpy(store->commandes.table[i].nom_client, &nom_client);
 	strcpy(store->commandes.table[i].produit, &produit);
 
-	//intialisation de la liste de tâches
+	//initialisation de la liste de tâches
 	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; speNbr++)
 	{
 		store->commandes.table[speNbr].liste_taches[speNbr].nb_heures_requises = 0;
