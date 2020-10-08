@@ -374,11 +374,14 @@ void traite_charge(Stockage* store) {
 * Enregistre une progression aux seins d'une specialité d'une commande
 */
 void traite_progression(Stockage* store) {
-	Mot produit, nom_client;
-	get_id(&produit);
-	get_id(&nom_client);
+	Mot commande, specialite;
+	get_id(&commande);
+	get_id(&specialite);
 	int heures_travaillees = get_int();
-	printf(MSG_PROGRESSION, produit, nom_client, heures_travaillees);
+
+	const unsigned int cmd_i = getIndex_cmd(&store->commandes, commande);
+	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
+	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_effectuees += heures_travaillees;
 }
 
 /*
