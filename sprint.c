@@ -187,10 +187,6 @@ void traite_specialites(Stockage* store) {
 * traite_embauche() : traite les arguments de la commande suivante :
 * embauche <Mot travailleur> <Mot specialite>
 */
-/*
-* traite_embauche() : traite les arguments de la commande suivante :
-* embauche <Mot travailleur> <Mot specialite>
-*/
 void traite_embauche(Stockage* store) {
 	Mot travailleur, specialite;
 	get_id(&travailleur);
@@ -329,11 +325,33 @@ void traite_commande(Stockage* store) {
 
 /*
 * traite_supervision()
-* supervision
-* Affiche l'avancement actuel des commandes
+* Affiche l'avancement actuel des commandes sous le format
+* OUT : "etat des taches pour <nom_produit> : [<liste>, ..., <liste>]"
+*		avec <liste> valant "<specialite>:<heures effectuées>/<heures nécessaires>"
 */
 void traite_supervision(Stockage* store) {
-	printf(MSG_SUPERVISION);
+	// test developpe prog 18 specialites embauche logan prog travailleurs tous demarche nounours client tous commande programme nounours client tous
+	
+	
+	for (int i = 0; i < store->commandes.inserted; i++)
+	{
+		printf("etat des taches pour %s : ", store->commandes.table[i].produit);
+		Booleen isFirstTime = VRAI;
+		for (int j = 0; j < MAX_SPECIALITES; j++)
+		{
+			if (isFirstTime) {
+				isFirstTime = FAUX;
+			}
+			else {
+				printf(", ");
+			}
+			
+			const Tache tacheCourante = store->commandes.table[i].liste_taches[j];
+			printf("%s:", store->specialites.table[i].nom);
+			printf("%d/%d", tacheCourante.nb_heures_effectuees, tacheCourante.nb_heures_requises);
+		}
+
+	}
 }
 
 /*
