@@ -15,8 +15,8 @@ Booleen EchoActif = FAUX;
 
 // Messages emis par les instructions
 
-#define MSG_DEVELOPPE "## nouvelle specialite \"%s\" ; cout horaire \"%d\"\n" 
-#define MSG_SPECIALITES "specialites traitees : " 
+#define MSG_DEVELOPPE "## nouvelle specialite \"%s\" ; cout horaire \"%d\"\n"
+#define MSG_SPECIALITES "specialites traitees : "
 #define MSG_INTERRUPTION "## fin de programme\n"
 #define MSG_TRAVAILLEURS "la specialite %s peut etre prise en charge par : "
 #define MSG_CLIENT "le client %s a commande : "
@@ -30,7 +30,7 @@ Booleen EchoActif = FAUX;
 // Lexemes
 
 #define LGMOT 35
-#define NBCHIFFREMAX 5 
+#define NBCHIFFREMAX 5
 #define MAX_COMMANDES 500
 #define MAX_SPECIALITES 10
 typedef char Mot[LGMOT + 1]; // Définition du type Mot
@@ -159,7 +159,7 @@ void traite_developpe(Stockage* store) {
 	int cout_horaire = get_int();
 
 	if (store->specialites.inserted < SPECIALITE_SIZE) {
-		strcpy(store->specialites.table[store->specialites.inserted].nom, &nom_specialite);
+		strcpy(store->specialites.table[store->specialites.inserted].nom, nom_specialite);
 		store->specialites.table[store->specialites.inserted].cout_horaire = cout_horaire;
 		store->specialites.inserted++;
 	}
@@ -194,7 +194,7 @@ void traite_embauche(Stockage* store) {
 	//printf(MSG_EMBAUCHE, travailleur, specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, &travailleur);
+		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
 		int indexSpe = getIndex_spe(&store->specialites, specialite);
 		store->travailleurs.table[store->travailleurs.inserted].tag_specialite[indexSpe] = VRAI;
 		store->travailleurs.inserted++;
@@ -252,7 +252,7 @@ void traite_demarche(Stockage* store) {
 	get_id(&nom_client);
 
 	if (store->clients.inserted < CLIENTS_SIZE) {
-		strcpy(store->clients.table[store->clients.inserted].nom, &nom_client);
+		strcpy(store->clients.table[store->clients.inserted].nom, nom_client);
 		store->clients.inserted++;
 	}
 }
@@ -285,7 +285,7 @@ void traite_client(Stockage* store) {
 		printf(MSG_CLIENT, nom_client);
 
 		const unsigned int newIndex = store->clients.inserted++; // incrémentation + stockage de l'ancien
-		strcpy(store->clients.table[newIndex].nom, &nom_client);
+		strcpy(store->clients.table[newIndex].nom, nom_client);
 
 		int passedCheck = 0;
 		for (int i = 0; i < store->commandes.inserted; ++i) {
@@ -312,15 +312,15 @@ void traite_commande(Stockage* store) {
 	get_id(&nom_client);
 
 	const unsigned int i = store->commandes.inserted++; // stockage puis incrémentation
-	strcpy(store->commandes.table[i].nom_client, &nom_client);
-	strcpy(store->commandes.table[i].produit, &produit);
+	strcpy(store->commandes.table[i].nom_client, nom_client);
+	strcpy(store->commandes.table[i].produit, produit);
 
 	//initialisation de la liste de tâches
 	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; speNbr++)
 	{
 		store->commandes.table[speNbr].liste_taches[speNbr].nb_heures_requises = 0;
 	}
-	
+
 }
 
 /*
@@ -331,8 +331,8 @@ void traite_commande(Stockage* store) {
 */
 void traite_supervision(Stockage* store) {
 	// test developpe prog 18 specialites embauche logan prog travailleurs tous demarche nounours client tous commande programme nounours client tous
-	
-	
+
+
 	for (int i = 0; i < store->commandes.inserted; i++)
 	{
 		printf("etat des taches pour %s : ", store->commandes.table[i].produit);
@@ -345,7 +345,7 @@ void traite_supervision(Stockage* store) {
 			else {
 				printf(", ");
 			}
-			
+
 			const Tache tacheCourante = store->commandes.table[i].liste_taches[j];
 			printf("%s:", store->specialites.table[i].nom);
 			printf("%d/%d", tacheCourante.nb_heures_effectuees, tacheCourante.nb_heures_requises);
@@ -371,7 +371,7 @@ void traite_tache(Stockage* store) {
 	// initialisation de la tâche pour la commande en question
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
 
-	printf(MSG_TACHE, commande, specialite, 
+	printf(MSG_TACHE, commande, specialite,
 			store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises);
 }
 
@@ -420,7 +420,7 @@ void traite_interruption() {
 	printf(MSG_INTERRUPTION);
 }
 
-// Porte d'entrée du programme 
+// Porte d'entrée du programme
 
 int main(int argc, char* argv[]) {
 	if (argc >= 2 && strcmp("echo", argv[1]) == 0) {
