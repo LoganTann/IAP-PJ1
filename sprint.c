@@ -283,10 +283,6 @@ void traite_client(Stockage* store) {
 	}
 	else {
 		printf(MSG_CLIENT, nom_client);
-
-		const unsigned int newIndex = store->clients.inserted++; // incrémentation + stockage de l'ancien
-		strcpy(store->clients.table[newIndex].nom, nom_client);
-
 		int passedCheck = 0;
 		for (int i = 0; i < store->commandes.inserted; ++i) {
 			if (strcmp(store->commandes.table[i].nom_client, nom_client) == 0) {
@@ -369,9 +365,6 @@ void traite_tache(Stockage* store) {
 	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
 	// initialisation de la tâche pour la commande en question
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
-
-	printf(MSG_TACHE, commande, specialite,
-			store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises);
 }
 
 /*
