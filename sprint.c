@@ -330,27 +330,26 @@ void traite_commande(Stockage* store) {
 *		avec <liste> valant "<specialite>:<heures effectuées>/<heures nécessaires>"
 */
 void traite_supervision(Stockage* store) {
-	// test developpe prog 18 specialites embauche logan prog travailleurs tous demarche nounours client tous commande programme nounours client tous
-
-
-	for (int i = 0; i < store->commandes.inserted; i++)
+	for (int i_cmd = 0; i_cmd < store->commandes.inserted; i_cmd++)
 	{
-		printf("etat des taches pour %s : ", store->commandes.table[i].produit);
+		printf("etat des taches pour %s : ", store->commandes.table[i_cmd].produit);
 		Booleen isFirstTime = VRAI;
-		for (int j = 0; j < MAX_SPECIALITES; j++)
+		for (int i_spe = 0; i_spe < MAX_SPECIALITES; i_spe++)
 		{
-			if (isFirstTime) {
-				isFirstTime = FAUX;
-			}
-			else {
-				printf(", ");
-			}
+			const Tache tacheCourante = store->commandes.table[i_cmd].liste_taches[i_spe];
+			if (tacheCourante.nb_heures_requises) { // valeur si vide : 0 = faux
+				if (isFirstTime) {
+					isFirstTime = FAUX;
+				}
+				else {
+					printf(", ");
+				}
 
-			const Tache tacheCourante = store->commandes.table[i].liste_taches[j];
-			printf("%s:", store->specialites.table[i].nom);
-			printf("%d/%d", tacheCourante.nb_heures_effectuees, tacheCourante.nb_heures_requises);
+				printf("%s:", store->specialites.table[i_spe].nom);
+				printf("%d/%d", tacheCourante.nb_heures_effectuees, tacheCourante.nb_heures_requises);
+			}
 		}
-
+		printf("\n");
 	}
 }
 
