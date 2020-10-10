@@ -146,6 +146,7 @@ int getIndex_spe(Specialites* specialites, Mot nom) {
 	}
 	return 0; //fallback
 }
+
 // Commandes
 
 /*
@@ -191,7 +192,6 @@ void traite_embauche(Stockage* store) {
 	Mot travailleur, specialite;
 	get_id(&travailleur);
 	get_id(&specialite);
-	//printf(MSG_EMBAUCHE, travailleur, specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
 		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
