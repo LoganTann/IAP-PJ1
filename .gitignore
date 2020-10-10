@@ -1,3 +1,26 @@
+# compilateur magique de Logan (vive atom, à bas V-$tudio)
+*tcc*
+
+# fichiers à ignorer explicitement avec les noms
+.ignore*
+
+# ??
+/sprints_1_a_6__in_out.zip
+/projet_memo___sprints_1_a_6.pdf
+
+# Fichiers propres à visual studio, inutiles
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+/IAP-PJ1.vcxproj.filters
+/IAP-PJ1.vcxproj.user
+/Debug
+/.vs
+/x64/Debug
+
+
 # Prerequisites
 *.d
 
@@ -45,17 +68,3 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-/IAP-PJ1.vcxproj.filters
-/IAP-PJ1.vcxproj.user
-/Debug
-/.vs
-
-.ignore*
-/x64/Debug
-/sprints_1_a_6__in_out.zip
-/projet_memo___sprints_1_a_6.pdf
