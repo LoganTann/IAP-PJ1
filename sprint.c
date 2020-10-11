@@ -23,7 +23,7 @@ Booleen EchoActif = FAUX;
 #define MSG_COMMANDE "## nouvelle commande \"%s\", par client \"%s\"\n"
 #define MSG_SUPERVISION "## consultation de l’avancement des commandes\n"
 #define MSG_TACHE "## la commande \"%s\" requiere la specialite \"%s\" (nombre d’heures \"%d\")\n"
-#define MSG_CHARGE   "## consultation de la charge de travail de \"%s\"\n"
+#define MSG_CHARGE   "charge de travail pour %s : "
 #define MSG_PROGRESSION "## pour la commande \"%s\", pour la specialite \"%s\" : \"%d\" heures de plus ont ete realisees\n"
 #define MSG_PASSE "## une reallocation est requise\n"
 
@@ -110,6 +110,9 @@ typedef struct {
 	Mot produit;
 	Mot nom_client;
 	Tache liste_taches[SPECIALITE_SIZE];
+
+	// L'identifiant du travailleur en charge de la tache
+	unsigned int en_charge_tache[SPECIALITE_SIZE];
 } Commande;
 
 typedef struct {
@@ -196,7 +199,11 @@ void traite_embauche(Stockage* store) {
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
 		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
 		int indexSpe = getIndex_spe(&store->specialites, specialite);
-		store->travailleurs.table[store->travailleurs.inserted].tag_specialite[indexSpe] = VRAI;
+		for (unsigned int i = 0; i < SPECIALITE_SIZE; i++) {
+			store->travailleurs.table[store->travailleurs.inserted]
+				.tag_specialite[i] = (i == indexSpe);
+				// Necessité d'initiliser chaque cases pour éviter des bugs.
+		}
 		store->travailleurs.inserted++;
 	}
 }
@@ -349,6 +356,26 @@ void traite_supervision(Stockage* store) {
 	}
 }
 
+
+/**
+ * Détermine le travailleur le plus adapté pour la réalisation d'une tâche.
+ * Une tâche étant déterminée par une spécialité, il attends donc en ENTREE
+ * l'identifiant d'une spécialitée attendue, et afin de faire ses opérations
+ * le pointeur du tableau de travailleurs
+ * En SORTIE, il retourne l'index du travailleur à prendre en charge.
+**/
+unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list) {
+	// ALPHA : le premier travailleur qui a la spécialité concernée est choisi
+	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; id_worker++) {
+		if (workers_list->table[id_worker].tag_specialite[id_spe] == VRAI) {
+			return id_worker;
+		}
+	}
+	return TRAVAILLEURS_SIZE;
+	// fallback : étant unsigned int, il est facile de savoir si aucun travailleur
+	// n'a été trouvé en faisant (determiner_travailleur_pour < TRAVAILLEURS_SIZE)
+}
+
 /*
 * traite_tache()
 * tache <Mot commande> <Mot specialite> <int heures>
@@ -365,6 +392,18 @@ void traite_tache(Stockage* store) {
 	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
 	// initialisation de la tâche pour la commande en question
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
+	// Assignation du travailleur à la tache
+	const unsigned int id_worker = determiner_travailleur_pour(id_spe, &store->travailleurs);
+	if (id_worker >= TRAVAILLEURS_SIZE && EchoActif) {
+		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
+	} else {
+		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
+	}
+	// Il sera nécessaire de stoker le nombre de [tâches||d'heures] au bout d'une
+	// affectation de tâche afin de trouver par la suite le meilleur travailleur
+	// pour la prochaine tâche
+	// pour la beta : set_total_tasks_for(Travailleur* travailleur);
+	// pour la release : set_total_hours_for(Travailleur* travailleur);
 }
 
 /*
@@ -376,6 +415,7 @@ void traite_charge(Stockage* store) {
 	Mot nom_travailleur;
 	get_id(&nom_travailleur);
 	printf(MSG_CHARGE, nom_travailleur);
+	// superProduit/reseau/45heure(s)
 }
 
 /*
