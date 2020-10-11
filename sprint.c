@@ -81,7 +81,7 @@ typedef struct {
 typedef struct {
 	Mot nom;
 	Booleen tag_specialite[SPECIALITE_SIZE];
-	int nb_tachesRealisees;
+	int heuresRealises;
 } Travailleur;
 
 typedef struct {
@@ -216,7 +216,6 @@ void traite_embauche(Stockage* store) {
 		}
 		else {
 			strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
-			store->travailleurs.table[store->travailleurs.inserted].nb_tachesRealisees = 0;
 			int indexSpe = getIndex_spe(&store->specialites, specialite);
 			for (unsigned int i = 0; i < SPECIALITE_SIZE; ++i) {
 				store->travailleurs.table[store->travailleurs.inserted]
@@ -388,14 +387,14 @@ void traite_supervision(Stockage* store) {
 unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list) {
 
 	unsigned int retval = TRAVAILLEURS_SIZE;
-	int lowestTask = SPECIALITE_SIZE;
+	int lowestHour = SPECIALITE_SIZE;
 
 	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; ++id_worker) {
 		if (workers_list->table[id_worker].tag_specialite[id_spe] == VRAI) {
 			// ce travailleur est capable de réaliser cette tache
-			if (lowestTask > workers_list->table[id_worker].nb_tachesRealisees) {
+			if (lowestHour > workers_list->table[id_worker].heuresRealises) {
 				retval = id_worker;
-				lowestTask = workers_list->table[id_worker].nb_tachesRealisees;
+				lowestHour = workers_list->table[id_worker].heuresRealises;
 			}
 		}
 	}
@@ -423,7 +422,7 @@ void traite_tache(Stockage* store) {
 	const unsigned int id_worker = determiner_travailleur_pour(id_spe, &store->travailleurs);
 	if (id_worker < TRAVAILLEURS_SIZE) {
 		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
-		store->travailleurs.table[id_worker].nb_tachesRealisees++;
+		store->travailleurs.table[id_worker].heuresRealises += heures;
 	} else if(EchoActif) {
 		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
 	}
