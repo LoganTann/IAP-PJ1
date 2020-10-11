@@ -81,6 +81,7 @@ typedef struct {
 typedef struct {
 	Mot nom;
 	Booleen tag_specialite[SPECIALITE_SIZE];
+	int nb_tachesRealisees;
 } Travailleur;
 
 typedef struct {
@@ -215,6 +216,7 @@ void traite_embauche(Stockage* store) {
 		}
 		else {
 			strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
+			store->travailleurs.table[store->travailleurs.inserted].nb_tachesRealisees = 0;
 			int indexSpe = getIndex_spe(&store->specialites, specialite);
 			for (unsigned int i = 0; i < SPECIALITE_SIZE; ++i) {
 				store->travailleurs.table[store->travailleurs.inserted]
@@ -384,16 +386,21 @@ void traite_supervision(Stockage* store) {
  * En SORTIE, il retourne l'index du travailleur à prendre en charge.
 **/
 unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list) {
-	// ALPHA : le premier travailleur qui a la spécialité concernée est choisi
+
+	unsigned int retval = TRAVAILLEURS_SIZE;
+	int lowestTask = SPECIALITE_SIZE;
+
 	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; ++id_worker) {
 		if (workers_list->table[id_worker].tag_specialite[id_spe] == VRAI) {
-			return id_worker;
+			// ce travailleur est capable de réaliser cette tache
+			if (lowestTask > workers_list->table[id_worker].nb_tachesRealisees) {
+				retval = id_worker;
+				lowestTask = workers_list->table[id_worker].nb_tachesRealisees;
+			}
 		}
 	}
-	return TRAVAILLEURS_SIZE;
-	// fallback : étant unsigned int, il est facile de savoir si aucun travailleur
-	// n'a été trouvé en faisant (determiner_travailleur_pour < TRAVAILLEURS_SIZE)
-	// de toute façon, un dépassement risque d'être provoqué en cas d'affectation
+
+	return retval;
 }
 
 /*
@@ -416,7 +423,8 @@ void traite_tache(Stockage* store) {
 	const unsigned int id_worker = determiner_travailleur_pour(id_spe, &store->travailleurs);
 	if (id_worker < TRAVAILLEURS_SIZE) {
 		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
-	} else if(EchoActif){
+		store->travailleurs.table[id_worker].nb_tachesRealisees++;
+	} else if(EchoActif) {
 		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
 	}
 	// Il sera nécessaire de stoker le nombre de [tâches||d'heures] au bout d'une
