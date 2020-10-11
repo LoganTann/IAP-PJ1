@@ -374,6 +374,7 @@ unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list)
 	return TRAVAILLEURS_SIZE;
 	// fallback : étant unsigned int, il est facile de savoir si aucun travailleur
 	// n'a été trouvé en faisant (determiner_travailleur_pour < TRAVAILLEURS_SIZE)
+	// de toue façon, un dépassement risque d'être provoqué en cas d'affectation
 }
 
 /*
@@ -394,10 +395,10 @@ void traite_tache(Stockage* store) {
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
 	// Assignation du travailleur à la tache
 	const unsigned int id_worker = determiner_travailleur_pour(id_spe, &store->travailleurs);
-	if (id_worker >= TRAVAILLEURS_SIZE && EchoActif) {
-		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
-	} else {
+	if (id_worker < TRAVAILLEURS_SIZE) {
 		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
+	} else if(EchoActif){
+		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
 	}
 	// Il sera nécessaire de stoker le nombre de [tâches||d'heures] au bout d'une
 	// affectation de tâche afin de trouver par la suite le meilleur travailleur
