@@ -138,7 +138,16 @@ int getIndex_cmd(Commandes* commandes, Mot nom_produit) {
 			return i;
 		}
 	}
-	return 0; //fallback
+	return -1; //fallback
+}
+
+int getIndex_trv(Travailleurs* travailleurs, Mot nom) {
+	for (unsigned int i = 0; i < travailleurs->inserted; i++) {
+		if (strcmp(travailleurs->table[i].nom, nom) == 0) {
+			return i;
+		}
+	}
+	return -1; //fallback
 }
 
 int getIndex_spe(Specialites* specialites, Mot nom) {
@@ -147,7 +156,7 @@ int getIndex_spe(Specialites* specialites, Mot nom) {
 			return i;
 		}
 	}
-	return 0; //fallback
+	return -1; //fallback
 }
 
 // Commandes
@@ -197,14 +206,23 @@ void traite_embauche(Stockage* store) {
 	get_id(&specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
-		int indexSpe = getIndex_spe(&store->specialites, specialite);
-		for (unsigned int i = 0; i < SPECIALITE_SIZE; i++) {
-			store->travailleurs.table[store->travailleurs.inserted]
-				.tag_specialite[i] = (i == indexSpe);
-				// Necessité d'initiliser chaque cases pour éviter des bugs.
+
+		int travailleurExistant = getIndex_trv(&store->travailleurs, travailleur);
+
+		if(travailleurExistant >= 0) {
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			store->travailleurs.table[travailleurExistant].tag_specialite[indexSpe] = VRAI;
 		}
-		store->travailleurs.inserted++;
+		else {
+			strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			for (unsigned int i = 0; i < SPECIALITE_SIZE; ++i) {
+				store->travailleurs.table[store->travailleurs.inserted]
+					.tag_specialite[i] = (i == indexSpe) ? VRAI : FAUX;
+				// Necessité d'initiliaser chaque cases pour éviter des bugs.
+			}
+			store->travailleurs.inserted++;
+		}
 	}
 }
 
@@ -220,7 +238,7 @@ void traite_travailleurs(Stockage* store) {
 		for (int specialitesI = 0; specialitesI < store->specialites.inserted; ++specialitesI) {
 			printf(MSG_TRAVAILLEURS, store->specialites.table[specialitesI].nom);
 			int passedCheck = 0;
-			for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
+			for (int travailleursI = 0; travailleursI < store->travailleurs.inserted; ++travailleursI) {
 				if (store->travailleurs.table[travailleursI].tag_specialite[specialitesI] == VRAI) {
 					if (passedCheck == 0)
 						printf("%s", store->travailleurs.table[travailleursI].nom);
@@ -319,9 +337,10 @@ void traite_commande(Stockage* store) {
 	strcpy(store->commandes.table[i].produit, produit);
 
 	//initialisation de la liste de tâches
-	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; speNbr++)
+	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; ++speNbr)
 	{
-		store->commandes.table[speNbr].liste_taches[speNbr].nb_heures_requises = 0;
+		store->commandes.table[i].liste_taches[speNbr].nb_heures_requises = 0;
+		store->commandes.table[i].liste_taches[speNbr].nb_heures_effectuees = 0;
 	}
 
 }
@@ -333,11 +352,11 @@ void traite_commande(Stockage* store) {
 *		avec <liste> valant "<specialite>:<heures effectuées>/<heures nécessaires>"
 */
 void traite_supervision(Stockage* store) {
-	for (int i_cmd = 0; i_cmd < store->commandes.inserted; i_cmd++)
+	for (int i_cmd = 0; i_cmd < store->commandes.inserted; ++i_cmd)
 	{
 		printf("etat des taches pour %s : ", store->commandes.table[i_cmd].produit);
 		Booleen isFirstTime = VRAI;
-		for (int i_spe = 0; i_spe < MAX_SPECIALITES; i_spe++)
+		for (int i_spe = 0; i_spe < store->specialites.inserted; ++i_spe)
 		{
 			const Tache tacheCourante = store->commandes.table[i_cmd].liste_taches[i_spe];
 			if (tacheCourante.nb_heures_requises) { // valeur si vide : 0 = faux
@@ -366,7 +385,7 @@ void traite_supervision(Stockage* store) {
 **/
 unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list) {
 	// ALPHA : le premier travailleur qui a la spécialité concernée est choisi
-	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; id_worker++) {
+	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; ++id_worker) {
 		if (workers_list->table[id_worker].tag_specialite[id_spe] == VRAI) {
 			return id_worker;
 		}
@@ -374,7 +393,7 @@ unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list)
 	return TRAVAILLEURS_SIZE;
 	// fallback : étant unsigned int, il est facile de savoir si aucun travailleur
 	// n'a été trouvé en faisant (determiner_travailleur_pour < TRAVAILLEURS_SIZE)
-	// de toue façon, un dépassement risque d'être provoqué en cas d'affectation
+	// de toute façon, un dépassement risque d'être provoqué en cas d'affectation
 }
 
 /*
@@ -415,8 +434,36 @@ void traite_tache(Stockage* store) {
 void traite_charge(Stockage* store) {
 	Mot nom_travailleur;
 	get_id(&nom_travailleur);
-	printf(MSG_CHARGE, nom_travailleur);
+	// printf(MSG_CHARGE, nom_travailleur);
 	// superProduit/reseau/45heure(s)
+
+	unsigned int travailleursId = getIndex_trv(&store->travailleurs, nom_travailleur);
+
+	printf("charge de travail pour %s : ", nom_travailleur);
+
+	Booleen isFirstTime = VRAI;
+	for (int commandesI = 0; commandesI < store->commandes.inserted; commandesI++) {
+		for (int specialitesI = 0; specialitesI < SPECIALITE_SIZE; specialitesI++) {
+
+			const Tache tache = store->commandes.table[commandesI].liste_taches[specialitesI];
+
+			if (store->commandes.table[commandesI].en_charge_tache[specialitesI] == travailleursId
+				&& tache.nb_heures_requises != tache.nb_heures_effectuees) {
+
+				if (isFirstTime) {
+					isFirstTime = FAUX;
+				} else {
+					printf(", ");
+				}
+
+				printf("%s/%s/%dheure(s)", store->commandes.table[commandesI], store->specialites.table[specialitesI].nom, tache.nb_heures_requises - tache.nb_heures_effectuees);
+				
+			}
+		}
+	}
+
+	printf("\n");
+
 }
 
 /*
