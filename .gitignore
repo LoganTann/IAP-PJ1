@@ -68,3 +68,4 @@ dkms.conf
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+/in4.txt

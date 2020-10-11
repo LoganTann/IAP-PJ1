@@ -314,7 +314,8 @@ void traite_commande(Stockage* store) {
 	//initialisation de la liste de tâches
 	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; speNbr++)
 	{
-		store->commandes.table[speNbr].liste_taches[speNbr].nb_heures_requises = 0;
+		store->commandes.table[i].liste_taches[speNbr].nb_heures_requises = 0;
+		store->commandes.table[i].liste_taches[speNbr].nb_heures_effectuees = 0;
 	}
 
 }
