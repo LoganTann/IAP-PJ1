@@ -121,6 +121,15 @@ typedef struct {
 
 // Santa's Little Helpers
 
+int getIndex_trv(Travailleurs* travailleurs, Mot nom) {
+	for (unsigned int i = 0; i < travailleurs->inserted; i++) {
+		if (strcmp(travailleurs->table[i].nom, nom) == 0) {
+			return i;
+		}
+	}
+	return -1; //fallback
+}
+
 int getIndex_spe(Specialites* specialites, Mot nom) {
 	for (unsigned int i = 0; i < specialites->inserted; i++) {
 		if (strcmp(specialites->table[i].nom, nom) == 0) {
@@ -171,18 +180,29 @@ void traite_specialites(Stockage* store) {
 * traite_embauche() : traite les arguments de la commande suivante :
 * embauche <Mot travailleur> <Mot specialite>
 */
-
 void traite_embauche(Stockage* store) {
 	Mot travailleur, specialite;
 	get_id(&travailleur);
 	get_id(&specialite);
-	//printf(MSG_EMBAUCHE, travailleur, specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, &travailleur);
-		int indexSpe = getIndex_spe(&store->specialites, specialite);
-		store->travailleurs.table[store->travailleurs.inserted].tag_specialite[indexSpe] = VRAI;
-		store->travailleurs.inserted++;
+
+		int travailleurExistant = getIndex_trv(&store->travailleurs, travailleur);
+
+		if(travailleurExistant >= 0) {
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			store->travailleurs.table[travailleurExistant].tag_specialite[indexSpe] = VRAI;
+		}
+		else {
+			strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			for (unsigned int i = 0; i < SPECIALITE_SIZE; ++i) {
+				store->travailleurs.table[store->travailleurs.inserted]
+					.tag_specialite[i] = (i == indexSpe) ? VRAI : FAUX;
+				// Necessité d'initiliaser chaque cases pour éviter des bugs.
+			}
+			store->travailleurs.inserted++;
+		}
 	}
 }
 
