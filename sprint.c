@@ -138,6 +138,15 @@ int getIndex_cmd(Commandes* commandes, Mot nom_produit) {
 	return 0; //fallback
 }
 
+int getIndex_trv(Travailleurs* travailleurs, Mot nom) {
+	for (unsigned int i = 0; i < travailleurs->inserted; i++) {
+		if (strcmp(travailleurs->table[i].nom, nom) == 0) {
+			return i;
+		}
+	}
+	return -1; //fallback
+}
+
 int getIndex_spe(Specialites* specialites, Mot nom) {
 	for (unsigned int i = 0; i < specialites->inserted; i++) {
 		if (strcmp(specialites->table[i].nom, nom) == 0) {
@@ -194,10 +203,23 @@ void traite_embauche(Stockage* store) {
 	get_id(&specialite);
 
 	if (store->travailleurs.inserted < TRAVAILLEURS_SIZE) {
-		strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
-		int indexSpe = getIndex_spe(&store->specialites, specialite);
-		store->travailleurs.table[store->travailleurs.inserted].tag_specialite[indexSpe] = VRAI;
-		store->travailleurs.inserted++;
+
+		int travailleurExistant = getIndex_trv(&store->travailleurs, travailleur);
+
+		if(travailleurExistant >= 0) {
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			store->travailleurs.table[travailleurExistant].tag_specialite[indexSpe] = VRAI;
+		}
+		else {
+			strcpy(store->travailleurs.table[store->travailleurs.inserted].nom, travailleur);
+			int indexSpe = getIndex_spe(&store->specialites, specialite);
+			for (unsigned int i = 0; i < SPECIALITE_SIZE; ++i) {
+				store->travailleurs.table[store->travailleurs.inserted]
+					.tag_specialite[i] = (i == indexSpe) ? VRAI : FAUX;
+				// Necessité d'initiliaser chaque cases pour éviter des bugs.
+			}
+			store->travailleurs.inserted++;
+		}
 	}
 }
 
