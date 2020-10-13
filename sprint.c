@@ -34,7 +34,7 @@ Booleen EchoActif = FAUX;
 #define MAX_COMMANDES 500
 #define MAX_SPECIALITES 10
 typedef char Mot[LGMOT + 1]; // Définition du type Mot
-
+typedef unsigned long long Gros_entier;
 /**
 	void get_id
 	@param id Mot:
@@ -111,7 +111,7 @@ typedef struct {
 	Mot produit;
 	Mot nom_client;
 	Tache liste_taches[SPECIALITE_SIZE];
-
+	Booleen complete;
 	// L'identifiant du travailleur en charge de la tache
 	unsigned int en_charge_tache[SPECIALITE_SIZE];
 } Commande;
@@ -336,6 +336,7 @@ void traite_commande(Stockage* store) {
 	const unsigned int i = store->commandes.inserted++; // stockage puis incrémentation
 	strcpy(store->commandes.table[i].nom_client, nom_client);
 	strcpy(store->commandes.table[i].produit, produit);
+	store->commandes.table[i].complete = FAUX;
 
 	//initialisation de la liste de tâches
 	for (unsigned int speNbr = 0; speNbr < MAX_SPECIALITES; ++speNbr)
@@ -474,11 +475,50 @@ void traite_charge(Stockage* store) {
 }
 
 /*
+* verif_facturation()
+* Vérification si les tâches sont complétées.
+*/
+Booleen verif_facturation(Stockage* store, const unsigned int cmd) {
+	int compteur = 0;
+	for (int spec = 0; spec < SPECIALITE_SIZE; ++spec) {
+		Tache tacheCourante = store->commandes.table[cmd].liste_taches[spec];
+		if (tacheCourante.nb_heures_effectuees >= tacheCourante.nb_heures_requises) {
+			compteur++;
+		}
+	}
+	if (compteur >= SPECIALITE_SIZE) {
+		return VRAI;
+	}
+	else {
+		return FAUX;
+	}
+}
+
+/*
+* verif_facturationsGlobales()
+* Vérification si absolutement toutes les commandes sont complétées.
+*/
+Booleen verif_facturationsGlobales(Stockage* store) {
+	int compteurGlobal = 0;
+	for (int cmd = 0; cmd < store->commandes.inserted; ++cmd) {
+		if (store->commandes.table[cmd].complete == VRAI) {
+			compteurGlobal++;
+		}
+	}
+	if (compteurGlobal == store->commandes.inserted) {
+		return VRAI;
+	}
+	else {
+		return FAUX;
+	}
+}
+
+/*
 * traite_progression()
 * tache <Mot produit> <Mot specialite> <int heures_travaillees>
 * Enregistre une progression aux seins d'une specialité d'une commande
 */
-void traite_progression(Stockage* store) {
+Booleen traite_progression(Stockage* store) {
 	Mot commande, specialite;
 	get_id(&commande);
 	get_id(&specialite);
@@ -487,6 +527,54 @@ void traite_progression(Stockage* store) {
 	const unsigned int cmd_i = getIndex_cmd(&store->commandes, commande);
 	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_effectuees += heures_travaillees;
+
+	Booleen checkFacturation = verif_facturation(store, cmd_i);
+	if (checkFacturation && store->commandes.table[cmd_i].complete == FAUX) {
+		printf("facturation %s : ", commande);
+		Booleen firstDone = VRAI;
+		for (int specCommande = 0; specCommande < SPECIALITE_SIZE; ++specCommande) {
+			if (store->commandes.table[cmd_i].liste_taches[specCommande].nb_heures_requises != 0) {
+				if (firstDone) {
+					firstDone = FAUX;
+				}
+				else {
+					printf(", ");
+				}
+				Gros_entier cout_commande = store->commandes.table[cmd_i].liste_taches[specCommande].nb_heures_effectuees * store->specialites.table[specCommande].cout_horaire;
+				printf("%s:%llu", store->specialites.table[specCommande].nom, cout_commande);
+				store->commandes.table[cmd_i].complete = VRAI;
+			}
+		}
+		printf("\n");
+	}
+
+	Booleen checkFacturationsGlobales = verif_facturationsGlobales(store);
+	if (checkFacturationsGlobales) {
+		printf("facturations : ");
+		Booleen firstDone = VRAI;
+		for (int client = 0; client < store->clients.inserted; ++client) {
+			Gros_entier cout_total_client = 0;
+			for (int commande = 0; commande < store->commandes.inserted; ++commande) {
+				if(strcmp(store->commandes.table[commande].nom_client, store->clients.table[client].nom) == 0) {
+					for (int spec = 0; spec < SPECIALITE_SIZE; ++spec) {
+						Tache tacheCourante = store->commandes.table[commande].liste_taches[spec];
+						cout_total_client += tacheCourante.nb_heures_effectuees * store->specialites.table[spec].cout_horaire;
+					}
+				}
+			}
+			if (firstDone) {
+				firstDone = FAUX;
+			}
+			else {
+				printf(", ");
+			}
+			printf("%s:%llu", store->clients.table[client].nom, cout_total_client);
+		}
+		printf("\n");
+		return FAUX;
+	}
+
+	return VRAI;
 }
 
 /*
@@ -504,7 +592,7 @@ void traite_passe() {
 * Interromp le programme
 */
 void traite_interruption() {
-	printf(MSG_INTERRUPTION);
+	//printf(MSG_INTERRUPTION);
 }
 
 // Porte d'entrée du programme
@@ -565,8 +653,11 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 		if (strcmp(buffer, "progression") == 0) {
-			traite_progression(&globalStore);
-			continue;
+			if (traite_progression(&globalStore)) {
+				continue;
+			} else {
+				break;
+			}
 		}
 		if (strcmp(buffer, "passe") == 0) {
 			traite_passe();
