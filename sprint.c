@@ -81,7 +81,6 @@ typedef struct {
 typedef struct {
 	Mot nom;
 	Booleen tag_specialite[SPECIALITE_SIZE];
-	int heuresRealises;
 } Travailleur;
 
 typedef struct {
