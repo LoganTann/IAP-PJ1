@@ -385,17 +385,35 @@ void traite_supervision(Stockage* store) {
  * le pointeur du tableau de travailleurs
  * En SORTIE, il retourne l'index du travailleur à prendre en charge.
 **/
-unsigned int determiner_travailleur_pour(int id_spe, Travailleurs *workers_list) {
+unsigned int determiner_travailleur_pour(int id_spe, Stockage* store) {
 
 	unsigned int retval = TRAVAILLEURS_SIZE;
-	int lowestHour = SPECIALITE_SIZE;
 
-	for (int id_worker = 0; id_worker < TRAVAILLEURS_SIZE; ++id_worker) {
-		if (workers_list->table[id_worker].tag_specialite[id_spe] == VRAI) {
-			// ce travailleur est capable de réaliser cette tache
-			if (lowestHour > workers_list->table[id_worker].heuresRealises) {
+	int totalWorker[TRAVAILLEURS_SIZE];
+	for (int i = 0; i < TRAVAILLEURS_SIZE; ++i) totalWorker[i] = 0;
+
+	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
+		for (int i_cmd = 0; i_cmd < store->commandes.inserted; ++i_cmd) {
+			for (int i_spe = 0; i_spe < store->specialites.inserted; ++i_spe) {
+				if (store->commandes.table[i_cmd].en_charge_tache[i_spe] == id_worker) {
+					totalWorker[id_worker] += store->commandes.table[i_cmd].liste_taches[i_spe].nb_heures_requises - store->commandes.table[i_cmd].liste_taches[i_spe].nb_heures_effectuees;
+				}
+			}
+		}
+	}
+
+	int lowestHours = -1;
+	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
+		if (store->travailleurs.table[id_worker].tag_specialite[id_spe] == VRAI) {
+			if (lowestHours < 0) {
+				lowestHours = totalWorker[id_worker];
+			}
+
+			if (EchoActif)
+				printf(">>> >>> %s %d: %d (%d)\n", store->travailleurs.table[id_worker].nom, id_worker, totalWorker[id_worker], lowestHours);
+			if (lowestHours >= totalWorker[id_worker]) {
 				retval = id_worker;
-				lowestHour = workers_list->table[id_worker].heuresRealises;
+				lowestHours = totalWorker[id_worker];
 			}
 		}
 	}
@@ -420,10 +438,9 @@ void traite_tache(Stockage* store) {
 	// initialisation de la tâche pour la commande en question
 	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_requises = heures;
 	// Assignation du travailleur à la tache
-	const unsigned int id_worker = determiner_travailleur_pour(id_spe, &store->travailleurs);
+	const unsigned int id_worker = determiner_travailleur_pour(id_spe, store);
 	if (id_worker < TRAVAILLEURS_SIZE) {
 		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
-		store->travailleurs.table[id_worker].heuresRealises += heures;
 	} else if(EchoActif) {
 		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
 	}
