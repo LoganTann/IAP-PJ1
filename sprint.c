@@ -384,13 +384,13 @@ void traite_supervision(Stockage* store) {
  * le pointeur du tableau de travailleurs
  * En SORTIE, il retourne l'index du travailleur à prendre en charge.
 **/
-unsigned int determiner_travailleur_pour(int id_spe, Stockage* store) {
+unsigned int determiner_travailleur_pour(const Stockage* store, int id_spe) {
 
 	unsigned int retval = TRAVAILLEURS_SIZE;
-
+	
 	int totalWorker[TRAVAILLEURS_SIZE];
 	for (int i = 0; i < TRAVAILLEURS_SIZE; ++i) totalWorker[i] = 0;
-
+	
 	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
 		for (int i_cmd = 0; i_cmd < store->commandes.inserted; ++i_cmd) {
 			for (int i_spe = 0; i_spe < store->specialites.inserted; ++i_spe) {
@@ -406,11 +406,12 @@ unsigned int determiner_travailleur_pour(int id_spe, Stockage* store) {
 		if (store->travailleurs.table[id_worker].tag_specialite[id_spe] == VRAI) {
 			if (lowestHours < 0) {
 				lowestHours = totalWorker[id_worker];
+				retval = id_worker;
 			}
 
 			if (EchoActif)
 				printf(">>> >>> %s %d: %d (%d)\n", store->travailleurs.table[id_worker].nom, id_worker, totalWorker[id_worker], lowestHours);
-			if (lowestHours >= totalWorker[id_worker]) {
+			if (lowestHours > totalWorker[id_worker]) {
 				retval = id_worker;
 				lowestHours = totalWorker[id_worker];
 			}
