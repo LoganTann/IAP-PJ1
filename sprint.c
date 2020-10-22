@@ -127,6 +127,7 @@ typedef struct {
 	// pour la commande progression passe
 	int lastCommande;
 	int lastSpecialite;
+	int lastProgression;
 } Stockage;
 
 // Declaration des prototypes de fonction ---------------------------------------------------//
@@ -288,6 +289,7 @@ int main(int argc, char* argv[]) {
 
 	globalStore.lastCommande = -1;
 	globalStore.lastSpecialite = -1;
+	globalStore.lastProgression = -1;
 
 	Mot buffer;
 	while (VRAI) {
@@ -488,7 +490,7 @@ void traite_travailleurs(const Stockage* store) {
 		printf(MSG_TRAVAILLEURS, specialite);
 		int indexSpe = getIndex_spe(&store->specialites, specialite);
 		int passedCheck = 0;
-		for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
+		for (int travailleursI = 0; travailleursI < store->travailleurs.inserted; ++travailleursI) {
 			if (store->travailleurs.table[travailleursI].tag_specialite[indexSpe] == VRAI) {
 				if (passedCheck == 0)
 					printf("%s", store->travailleurs.table[travailleursI].nom);
@@ -645,11 +647,12 @@ char determiner_travailleur_pour(const Stockage* store, int id_spe) {
 		if (store->travailleurs.table[id_worker].tag_specialite[id_spe] == VRAI) {
 			if (lowestHours < 0) {
 				lowestHours = totalWorker[id_worker];
+				retval = id_worker;
 			}
 
 			if (EchoActif)
 				printf(">>> >>> %s %d: %d (%d)\n", store->travailleurs.table[id_worker].nom, id_worker, totalWorker[id_worker], lowestHours);
-			if (lowestHours >= totalWorker[id_worker]) {
+			if (lowestHours > totalWorker[id_worker]) {
 				retval = id_worker;
 				lowestHours = totalWorker[id_worker];
 			}
@@ -786,6 +789,7 @@ Booleen traite_progression(Stockage* store) {
 
 	store->lastCommande = cmd_i;
 	store->lastSpecialite = id_spe;
+	store->lastProgression = heures_travaillees;
 
 	Booleen checkFacturation = verif_facturation(store, cmd_i);
 	if (checkFacturation && store->commandes.table[cmd_i].complete == FAUX) {
