@@ -727,11 +727,6 @@ void traite_charge(const Stockage* store) {
 				}
 
 				printf("%s/%s/%dheure(s)", store->commandes.table[commandesI].produit, store->specialites.table[specialitesI].nom, tache.nb_heures_requises - tache.nb_heures_effectuees);
-<<<<<<< HEAD
-
-=======
-				
->>>>>>> 38b05ef398183933cd3cb76989d87ec57c893207
 			}
 		}
 	}
