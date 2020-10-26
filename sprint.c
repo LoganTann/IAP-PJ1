@@ -22,7 +22,7 @@ Booleen EchoActif = FAUX;
 #define MSG_CHARGE  "charge de travail pour %s : "
 #define MSG_SUPERVISION "etat des taches pour %s : "
 #define MSG_FACTURATION "facturation %s : "
-#define MSG_FACTURATION_SEULE "facturation : "
+#define MSG_FACTURATION_SEULE "facturations : "
 
 // Lexemes
 
@@ -127,146 +127,182 @@ typedef struct {
 	int lastProgression;
 } Stockage;
 
-// Declaration des prototypes de fonction ---------------------------------------------------//
+// Declaration des prototypes de fonction ------------------------------------//
 
 
 // fonctions helpers
 
 /**
-* [brief] Permet de récupérer une entrée écrite par l'utilisateur.
-* id [out] Pointeur de type Mot qui permettra la modification de la variable originale.
+* [brief] : Permet de récupérer une entrée écrite par l'utilisateur.
+* id [out]: Pointeur de type Mot qui permettra la modification de la variable
+*			originale.
 * [pre] (l'entrée de l'utilisateur doit être valide)
 **/
 void get_id(Mot* id);
 
 /**
-* [brief] A le même effet que get_id, mais retourne l'entrée en tant que int plutôt que affecter dans l'argument via pointeur.
+* [brief] : A le même effet que get_id, mais retourne l'entrée en tant que int
+*			plutôt que affecter dans l'argument via pointeur.
 * [pre] (l'entrée de l'utilisateur doit être un entier naturel)
 * return: l'entier qui a été entré par l'utilisateur.
 **/
 int get_int();
 
 /**
-* [brief] Donné une structure Commandes (in 1) et le nom d'un produit (in 2), retourne l'indice du produit concerné dans le tableau de la structure Commandes.
-*	ie. trouve et retourne l'entier n tel que Commandes->table[n].produit est égale nom_produit
-* commandes [in] : pointeur constant d'une struct de type Commandes. Spécifie la struct dans laquelle on va chercher.
-* nom_produit [in] : de type Mot. Spécifie le nom du produit à rechercher dans la struct donnée en tant que premier argument.
-* return: l'indice du produit concerné dans le tableau de la structure Commandes.
+* [brief] :	trouve et retourne l'entier n tel que Commandes->table[n].produit
+*			(in 1) est égal à nom_produit (in 2)
+* commandes [in]:	pointeur constant d'une struct de type Commandes. Spécifie 
+*					la struct dans laquelle on va chercher.
+* nom_produit [in]: de type Mot. Spécifie le nom du produit à rechercher dans la
+*					struct donnée en tant que premier argument.
+* return: l'indice du produit concerné dans le tableau de la structure Commandes
 **/
 int getIndex_cmd(const Commandes* commandes, Mot nom_produit);
 
 /**
-* [brief] Donné une structure Travailleurs (in 1) et le nom d'un travailleur (in 2), retourne l'indice du travailleur concerné dans le tableau de la structure Travailleurs.
-*	ie. trouve et retourne l'entier n tel que Travailleurs->table[n].nom est égale nom
-* travailleurs [in] : pointeur constant d'une struct de type Travailleurs. Spécifie la struct dans laquelle on va chercher.
-* nom [in] : de type Mot. Spécifie le nom du travailleur à rechercher dans la struct donnée en tant que premier argument.
-* return: l'indice du travailleur concerné dans le tableau de la structure Travailleurs.
+* [brief] : trouve et retourne l'entier n tel que Travailleurs->table[n].nom (in1)
+*			est égale nom
+* travailleurs [in] :	pointeur constant d'une struct de type Travailleurs.
+*						Spécifie la struct dans laquelle on va chercher.
+* nom [in] :	de type Mot. Spécifie le nom du travailleur à rechercher dans la
+*				struct donnée en tant que premier argument.
+* return:	l'indice du travailleur concerné dans le tableau de la
+*			structure Travailleurs.
 **/
 int getIndex_trv(const Travailleurs* travailleurs, Mot nom);
 
 /**
-* [brief] Donné une structure Specialites (in 1) et le nom d'une spécialité (in 2), retourne l'indice de la spécialité concerné dans le tableau de la structure Specialites.
-*   ie. trouve et retourne l'entier n tel que Specialites->table[n].nom est égale nom
-* specialites [in] : pointeur constant d'une struct de type Specialites. Spécifie la struct dans laquelle on va chercher.
-* nom [in] : de type Mot. Spécifie le nom de la spécialité à rechercher dans la struct donnée en tant que premier argument.
-* return: l'indice de la spécialité concerné dans le tableau de la structure Specialites.
+* [brief] : trouve et retourne l'entier n tel que Specialites->table[n].nom (in1)
+*			est égal à nom (in2)
+* specialites [in]: pointeur constant d'une struct de type Specialites.
+*					Spécifie la struct dans laquelle on va chercher.
+* nom [in] : de type Mot. Spécifie le nom de la spécialité à rechercher dans la
+*			 struct donnée en tant que premier argument.
+* return :	l'indice de la spécialité concerné dans le tableau de la structure
+*			Specialites.
 **/
 int getIndex_spe(const Specialites* specialites, Mot nom);
 
 /**
-* [brief] Une spécialité sera créée à l'aide de l'entrée utilisateur demandée.
-* store [in-out] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] : Une spécialité sera créée à l'aide de l'entrée utilisateur demandée.
+* store [in-out] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*					struct dans laquelle on va chercher et éditer.
 **/
 void traite_developpe(Stockage* store);
 
 /**
-* [brief] La liste des spécialités sera affichée à l'utilisateur.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] : La liste des spécialités sera affichée à l'utilisateur.
+* store [in] :	Pointeur constant d'une struct de type Stockage.
+*				Spécifie la struct dans laquelle on va chercher.
 **/
 void traite_specialites(const Stockage* store);
 
 /**
-* [brief] Un nouveau travailleur sera crée à l'aide de l'entrée utilisateur.
-* store [in-out] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] : Un nouveau travailleur sera crée à l'aide de l'entrée utilisateur.
+* store [in-out] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*					struct dans laquelle on va chercher et éditer.
 **/
 void traite_embauche(Stockage* store);
 
 /**
-* [brief] La liste des travailleurs sera affichée à l'utilisateur selon la spécialité mentionnée ou "tous".
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] : La liste des travailleurs sera affichée à l'utilisateur selon la
+*			spécialité mentionnée ou "tous".
+* store [in] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
 **/
 void traite_travailleurs(const Stockage* store);
 
 /**
-* [brief] Un nouveau client sera crée à l'aide de l'entrée utilisateur.
-* store [in-out] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] : Un nouveau client sera crée à l'aide de l'entrée utilisateur.
+* store [in-out] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*					struct dans laquelle on va chercher et éditer.
 **/
 void traite_demarche(Stockage* store);
 
 /**
-* [brief] La liste des commandes d'un client donnée par l'utilisateur sera affichée à l'utilisateur.
-*		  L'utilisateur peut aussi mentionner "tous" si il veut voir toutes les commandes de chaque client.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] : La liste des commandes d'un client donnée par l'utilisateur sera
+*			affichée à l'utilisateur.
+*			L'utilisateur peut aussi mentionner "tous" si il veut voir toutes
+*			les commandes de chaque client.
+* store [in] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
 **/
 void traite_client(const Stockage* store);
 
 /**
-* [brief] Une nouvelle commande sera créée à l'aide de l'entrée utilisateur.
-* store [in-out] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] : Une nouvelle commande sera créée à l'aide de l'entrée utilisateur.
+* store [in-out] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*					struct dans laquelle on va chercher et éditer.
 **/
 void traite_commande(Stockage* store);
 
 /**
-* [brief] Affiche l'avancement actuel des commandes.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] : Affiche l'avancement actuel des commandes.
+* store [in] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
 **/
 void traite_supervision(const Stockage* store);
 
 /**
-* [brief] Determine le travailleur le plus adéquat pour une spécialité et le renvoie sous forme de char car le MAX_TRAVAILLEURS < CHAR_MAX.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] : Determine le travailleur le plus adéquat pour une spécialité et le
+*			renvoie sous forme de char car le MAX_TRAVAILLEURS < CHAR_MAX.
+* store [in] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
 * id_spe [in] : indice de la spécialité.
 * return: indice du travailleur determiné.
 **/
 char determiner_travailleur_pour(const Stockage* store, int id_spe);
 
 /**
-* [brief] Ajoute une specialité ainsi que le nombre d'heures requises à une commande.
-* store [in-out] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] : Ajoute une specialité ainsi que le nombre d'heures requises à une
+*			commande.
+* store [in-out] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*					struct dans laquelle on va chercher et éditer.
 **/
 void traite_tache(Stockage* store);
 
 /**
 * [brief] Affiche la charge de travail d'un travailleur.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* store [in] :	Pointeur constant d'une struct de type Stockage.
+*				Spécifie la struct dans laquelle on va chercher.
 **/
 void traite_charge(const Stockage* store);
 
 /**
-* [brief] Vérifie si toutes les tâches de la commande spécifiée dans l'argument cmd sont complétées.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
+* [brief] :	Vérifie si toutes les tâches de la commande spécifiée dans l'argument
+*			cmd sont complétées.
+* store [in] :	pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
 * cmd [in] : indice de la commande
-* return: booleen VRAI ou FAUX indiquant si les tâches de la commande spécifiée sont bien completées.
+* return:	booleen VRAI ou FAUX indiquant si les tâches de la commande spécifiée
+*			sont bien completées.
 **/
 Booleen verif_facturation(const Stockage* store, unsigned int cmd);
 
 /**
 * [brief] Vérifie si absolutement toutes les commandes sont complétées.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher.
-* return: booleen VRAI ou FAUX indiquant si toutes les tâches de toutes les commande sont bien completées.
+* store [in] :  pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher.
+* return: booleen VRAI ou FAUX indiquant si toutes les tâches de toutes les
+*		  commande sont bien completées.
 **/
 Booleen verif_facturationsGlobales(const Stockage* store);
 
 /**
 * [brief] Indique une progression pour une tâche donnée par l'entrée utilisateur.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
-* return: booleen VRAI ou FAUX indiquant si toutes les tâches de toutes les commande sont bien completées en utilisant les fonctions de vérifications au dessus.
+* store [in] :  pointeur constant d'une struct de type Stockage. Spécifie la
+*				struct dans laquelle on va chercher et éditer.
+* return: booleen VRAI ou FAUX indiquant si toutes les tâches de toutes les
+*		  commande sont bien completées en utilisant les fonctions de vérifica-
+*		  tions au dessus.
 **/
 Booleen traite_progression(Stockage* store);
 
 /**
-* [brief] Réaffecte un nouveau travailleur pour la dernière tâche passée dans l'instruction progression.
-* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la struct dans laquelle on va chercher et éditer.
+* [brief] Réaffecte un nouveau travailleur pour la dernière tâche passée dans
+*		  l'instruction progression.
+* store [in] : pointeur constant d'une struct de type Stockage. Spécifie la
+*			   struct dans laquelle on va chercher et éditer.
 **/
 void traite_passe(Stockage* store);
 
@@ -409,7 +445,8 @@ void traite_developpe(Stockage* store) {
 * traite_specialites()|| CF. prototype pour la doc de cette fonction
 *
 * Entrée utilisateur attendue : specialites
-* Cette instruction affiche les specialités enregistrées dans le programme dans l’ordre de leur déclaration, ainsi que le coût associé
+* Cette instruction affiche les specialités enregistrées dans le programme dans
+* l’ordre de leur déclaration, ainsi que le coût associé
 */
 void traite_specialites(const Stockage* store) {
 	printf(MSG_SPECIALITES);
@@ -599,7 +636,7 @@ void traite_commande(Stockage* store) {
 	get_id(&nom_client);
 
 	// initialisation de la nouvelle commande
-	const unsigned int i = store->commandes.inserted++; // stockage puis incrémentation
+	const unsigned int i = store->commandes.inserted++;
 	strcpy(store->commandes.table[i].nom_client, nom_client);
 	strcpy(store->commandes.table[i].produit, produit);
 	store->commandes.table[i].complete = FAUX;
@@ -656,40 +693,45 @@ char determiner_travailleur_pour(const Stockage* store, int id_spe) {
 
 	unsigned int retval = TRAVAILLEURS_SIZE;
 
+	// initialise le tableau qui va contenir la charge de chaque travailleur
 	int totalWorker[TRAVAILLEURS_SIZE];
 	for (int i = 0; i < TRAVAILLEURS_SIZE; ++i) totalWorker[i] = 0;
 
-	int nb_travailleurs = store->travailleurs.inserted;
-	int nb_commandes = store->commandes.inserted;
-	int nb_specialites = store->specialites.inserted;
+	// boucle sur chaque travailleur dont sa charge sera calculée
+	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
 
-	// calcul de la charge de chaque travailleurs
-	for (int id_worker = 0; id_worker < nb_travailleurs; ++id_worker) {
-		for (int i_cmd = 0; i_cmd < nb_commandes; ++i_cmd) {
-			for (int i_spe = 0; i_spe < nb_specialites; ++i_spe) {
-				const Commande* commande = &store->commandes.table[i_cmd];
-				if (commande->en_charge_tache[i_spe] != id_worker) {
-					break;
-				} // sinon si c'est valide, on fait notre petit calcul
-				const Tache* tacheCourante = &commande->liste_taches[i_spe];
-				totalWorker[id_worker] += tacheCourante->nb_heures_requises;
-				totalWorker[id_worker] -= tacheCourante->nb_heures_effectuees;
+		// pour chaque commande ... :
+		for (int i_cmd = 0; i_cmd < store->commandes.inserted; ++i_cmd) {
+			const Commande* curr_cmd = &store->commandes.table[i_cmd];
+
+			// regarde si le travailleur actuel est sur la spé en question ... :
+			for (int i_spe = 0; i_spe < store->specialites.inserted; ++i_spe) {
+				if (curr_cmd->en_charge_tache[i_spe] == id_worker) {
+
+					// ... et ajoute un peu de charge de travail selon les stats
+					// de la spé
+					totalWorker[id_worker] += (
+						  curr_cmd->liste_taches[i_spe].nb_heures_requises
+						- curr_cmd->liste_taches[i_spe].nb_heures_effectuees
+					);
+				}
 			}
 		}
 	}
 
+	// Une fois la charge de chaque travailleur calculée, on fait une recherche
+	// du travailleur ayant la plus petite charge
 	int lowestHours = -1;
-	for (int id_worker = 0; id_worker < nb_travailleurs; ++id_worker) {
-		const Travailleur* travailleur = &store->travailleurs.table[id_worker];
-		if (travailleur->tag_specialite[id_spe] == VRAI) {
+	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
+		if (store->travailleurs.table[id_worker].tag_specialite[id_spe] == VRAI) {
 			if (lowestHours < 0) {
 				lowestHours = totalWorker[id_worker];
 				retval = id_worker;
 			}
 
 			if (EchoActif) {
-				printf(">>> %s %d: %d (%d)\n",
-					travailleur->nom,
+				printf(">>> travailleur trouvé %s %d: %d (%d)\n",
+					store->travailleurs.table[id_worker].nom,
 					id_worker,
 					totalWorker[id_worker],
 					lowestHours);
@@ -731,7 +773,7 @@ void traite_tache(Stockage* store) {
 		commandeCourante->en_charge_tache[id_spe] = id_worker;
 	}
 	else if (EchoActif) {
-		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
+		printf("!!! aucun travailleur trouvé pour traiter la spé demandée.\n");
 	}
 }
 
@@ -820,8 +862,10 @@ Booleen verif_facturationsGlobales(const Stockage* store) {
 /*
 * traite_progression() || CF. prototype pour la doc de cette fonction
 *
-* entrée utilisateur attendue tache : <Mot produit> <Mot specialite> <int heures_travaillees>
-* Donné le nom d'une commande, et le nom de la spécialité à mettre à jour, modifie son nombre d'heures travaillées
+* entrée utilisateur attendue tache :
+*  <Mot produit> <Mot specialite> <int heures_travaillees>
+* Donné le nom d'une commande, et le nom de la spécialité à mettre à jour,
+* modifie son nombre d'heures travaillées
 */
 Booleen traite_progression(Stockage* store) {
 	Mot commande, specialite;
@@ -829,48 +873,80 @@ Booleen traite_progression(Stockage* store) {
 	get_id(&specialite);
 	int heures_travaillees = get_int();
 
+	// fais la correspondance entre entrée et donnée stockée, puis mets à jour
+	// la progression des taches
 	const unsigned int cmd_i = getIndex_cmd(&store->commandes, commande);
 	const unsigned int id_spe = getIndex_spe(&store->specialites, specialite);
-	store->commandes.table[cmd_i].liste_taches[id_spe].nb_heures_effectuees += heures_travaillees;
+	Commande* current_cmd = &store->commandes.table[cmd_i];
+	current_cmd->liste_taches[id_spe].nb_heures_effectuees += heures_travaillees;
 
+	// stockage d'un historique court pour la commande passe
 	store->lastCommande = cmd_i;
 	store->lastSpecialite = id_spe;
 	store->lastProgression = heures_travaillees;
 
+	// vérification de la facturation, et traitement conséquent au besoin
 	Booleen checkFacturation = verif_facturation(store, cmd_i);
-	if (checkFacturation && store->commandes.table[cmd_i].complete == FAUX) {
+	if (checkFacturation && current_cmd->complete == FAUX) {
 		printf(MSG_FACTURATION, commande);
 		Booleen firstDone = VRAI;
-		for (int specCommande = 0; specCommande < SPECIALITE_SIZE; ++specCommande) {
-			if (store->commandes.table[cmd_i].liste_taches[specCommande].nb_heures_requises != 0) {
+
+		// pour chaque spé, si celle-ci est définie (nb_heures_requises != 0)...
+		for (int id_spe = 0; id_spe < SPECIALITE_SIZE; ++id_spe) {
+			if (current_cmd->liste_taches[id_spe].nb_heures_requises != 0) {
+
 				if (firstDone) {
 					firstDone = FAUX;
 				}
 				else {
 					printf(", ");
 				}
-				Gros_entier cout_commande = (Gros_entier)store->commandes.table[cmd_i].liste_taches[specCommande].nb_heures_effectuees * (Gros_entier)store->specialites.table[specCommande].cout_horaire;
-				printf("%s:%llu", store->specialites.table[specCommande].nom, cout_commande);
-				store->commandes.table[cmd_i].complete = VRAI;
+
+				// ... calcul du cout de la commande et affichage
+				Gros_entier cout_commande = (
+					  current_cmd->liste_taches[id_spe].nb_heures_effectuees
+					* store->specialites.table[id_spe].cout_horaire
+				);
+				printf("%s:%llu",
+					store->specialites.table[id_spe].nom,
+					cout_commande
+				);
+				current_cmd->complete = VRAI;
 			}
 		}
 		printf("\n");
 	}
 
+	// idem, mais pour la facturation globale
 	Booleen checkFacturationsGlobales = verif_facturationsGlobales(store);
 	if (checkFacturationsGlobales) {
 		printf(MSG_FACTURATION_SEULE);
 		Booleen firstDone = VRAI;
+
+		// pour chaque commande, regarder chaque client ...
 		for (int client = 0; client < store->clients.inserted; ++client) {
 			Gros_entier cout_total_client = 0;
 			for (int commande = 0; commande < store->commandes.inserted; ++commande) {
-				if (strcmp(store->commandes.table[commande].nom_client, store->clients.table[client].nom) == 0) {
+				Commande* current_cmd = &store->commandes.table[commande];
+
+				// ... et si celui-ci est bien en charge de cette commande, 
+				// regarder chaque tache ...
+				if (strcmp(current_cmd->nom_client, store->clients.table[client].nom) == 0) {
 					for (int spec = 0; spec < SPECIALITE_SIZE; ++spec) {
-						Tache tacheCourante = store->commandes.table[commande].liste_taches[spec];
-						cout_total_client += tacheCourante.nb_heures_effectuees * store->specialites.table[spec].cout_horaire;
+						Tache tacheCourante = current_cmd->liste_taches[spec];
+
+						// puis mettre à jour le coût total du client en fonction
+						// de son nombre d'heures effectuées et du coût horaire
+						// de la spé
+						cout_total_client += (
+							  tacheCourante.nb_heures_effectuees
+							* store->specialites.table[spec].cout_horaire
+						);
 					}
 				}
 			}
+
+			// enfin, une fois le coût total du client calculé, faire l'affichage.
 			if (firstDone) {
 				firstDone = FAUX;
 			}
@@ -890,17 +966,22 @@ Booleen traite_progression(Stockage* store) {
 * traite_passe() || CF. prototype pour la doc de cette fonction
 *
 * entrée utilisateur attendue : passe
-* réaffecte un nouveau travailleur pour la dernière tâche passée en argument de l'instruction progression
+* réaffecte un nouveau travailleur pour la dernière tâche passée en argument de
+* l'instruction progression
 */
 void traite_passe(Stockage* store) {
 	if (store->lastCommande && store->lastSpecialite) {
-		if (EchoActif)
-			printf(">>> commande: %d / specialite: %d / worker actuel: %d \n", store->lastCommande, store->lastSpecialite, store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite]);
-		const unsigned int id_worker = determiner_travailleur_pour(store, store->lastSpecialite);
+		// recherche le meilleur travailleur
+		const unsigned int id_worker = determiner_travailleur_pour(
+			store,
+			store->lastSpecialite
+		);
 
-		store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite] = id_worker;
-		if (EchoActif)
-			printf(">>> nouveau worker: %d - %d\n", id_worker, store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite]);
+		// et en conséquence, change l'id du travailleur par celui nouvellement
+		// trouvé dans la dernière spécialitée utilisée avec la commande traite
+		store->commandes.table[store->lastCommande]
+			.en_charge_tache[store->lastSpecialite] = id_worker;
+
 		store->lastCommande = 0;
 		store->lastSpecialite = 0;
 	}
