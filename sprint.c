@@ -127,6 +127,7 @@ typedef struct {
 	// pour la commande progression passe
 	int lastCommande;
 	int lastSpecialite;
+	int lastProgression;
 } Stockage;
 
 // Declaration des prototypes de fonction ---------------------------------------------------//
@@ -288,6 +289,7 @@ int main(int argc, char* argv[]) {
 
 	globalStore.lastCommande = -1;
 	globalStore.lastSpecialite = -1;
+	globalStore.lastProgression = -1;
 
 	Mot buffer;
 	while (VRAI) {
@@ -388,7 +390,7 @@ int getIndex_spe(const Specialites* specialites, Mot nom) {
 
 /*
 * traite_developpe() || CF. prototype pour la doc de cette fonction
-* 
+*
 * Entrée utilisateur attendue : developpe <Mot nom_specialite> <int cout_horaire>
 * où nom_specialite est le nom de la spécialité à créer
 * et cout_horaire le prix de facturation d'une heure de travail pour cette spé
@@ -407,7 +409,7 @@ void traite_developpe(Stockage* store) {
 
 /*
 * traite_specialites()|| CF. prototype pour la doc de cette fonction
-* 
+*
 * Entrée utilisateur attendue : specialites
 * Cette instruction affiche les specialités enregistrées dans le programme dans l’ordre de leur déclaration, ainsi que le coût associé
 */
@@ -426,7 +428,7 @@ void traite_specialites(Stockage* store) {
 
 /*
 * traite_embauche()|| CF. prototype pour la doc de cette fonction
-* 
+*
 * Entrée utilisateur attendue : embauche <Mot travailleur> <Mot specialite>
 * Recherche le travailleur qui a pour nom le premier argument (ci celui-ci n'existe pas, alors il sera créé),
 * et lui assigne la spécialité donnée en tant que second argument
@@ -440,7 +442,7 @@ void traite_embauche(Stockage* store) {
 
 		int travailleurExistant = getIndex_trv(&store->travailleurs, travailleur);
 
-		if(travailleurExistant >= 0) {
+		if (travailleurExistant >= 0) {
 			int indexSpe = getIndex_spe(&store->specialites, specialite);
 			store->travailleurs.table[travailleurExistant].tag_specialite[indexSpe] = VRAI;
 		}
@@ -460,7 +462,7 @@ void traite_embauche(Stockage* store) {
 
 /*
 * traite_travailleurs() || CF. prototype pour la doc de cette fonction
-* 
+*
 * Entrée utilisateur attendue : travailleurs <Mot specialite || "tous">
 * Affiche la liste des travailleurs compétents pour la spécialité donnée en argument,par ordre de déclaration des travailleurs.
 * Si le nom de la spécialité vaut "tous", affiche la liste des travailleurs pour toutes les spécialités.
@@ -488,7 +490,7 @@ void traite_travailleurs(const Stockage* store) {
 		printf(MSG_TRAVAILLEURS, specialite);
 		int indexSpe = getIndex_spe(&store->specialites, specialite);
 		int passedCheck = 0;
-		for (int travailleursI = store->travailleurs.inserted; travailleursI >= 0; --travailleursI) {
+		for (int travailleursI = 0; travailleursI < store->travailleurs.inserted; ++travailleursI) {
 			if (store->travailleurs.table[travailleursI].tag_specialite[indexSpe] == VRAI) {
 				if (passedCheck == 0)
 					printf("%s", store->travailleurs.table[travailleursI].nom);
@@ -503,7 +505,7 @@ void traite_travailleurs(const Stockage* store) {
 
 /*
 * traite_demarche() || CF. prototype pour la doc de cette fonction
-* 
+*
 * demarche <Mot nom_client>
 * Déclare un nouveau client qui aura pour nom le premier argument
 */
@@ -519,7 +521,7 @@ void traite_demarche(Stockage* store) {
 
 /*
 * traite_client() || CF. prototype pour la doc de cette fonction
-* 
+*
 * client <Mot nom_client>
 * Affiche les commandes du client ayant pour nom le premier argument
 */
@@ -560,7 +562,7 @@ void traite_client(const Stockage* store) {
 
 /*
 * traite_commande() || CF. prototype pour la doc de cette fonction
-* 
+*
 * commande <Mot produit> <Mot nom_client>
 * Ajoute une commande au programme, qui aura pour nom le premier argument.
 * Le second spécifie le nom du client qui l'a commandé
@@ -586,7 +588,7 @@ void traite_commande(Stockage* store) {
 
 /*
 * traite_supervision() || CF. prototype pour la doc de cette fonction
-* 
+*
 * Affiche l'avancement actuel des commandes sous le format suivant:
 *	"etat des taches pour <nom_produit> : [<liste>, ..., <liste>]"
 *		avec <liste> valant "<specialite>:<heures effectuées>/<heures nécessaires>"
@@ -626,10 +628,10 @@ void traite_supervision(const Stockage* store) {
 char determiner_travailleur_pour(const Stockage* store, int id_spe) {
 
 	unsigned int retval = TRAVAILLEURS_SIZE;
-	
+
 	int totalWorker[TRAVAILLEURS_SIZE];
 	for (int i = 0; i < TRAVAILLEURS_SIZE; ++i) totalWorker[i] = 0;
-	
+
 	for (int id_worker = 0; id_worker < store->travailleurs.inserted; ++id_worker) {
 		for (int i_cmd = 0; i_cmd < store->commandes.inserted; ++i_cmd) {
 			for (int i_spe = 0; i_spe < store->specialites.inserted; ++i_spe) {
@@ -645,11 +647,12 @@ char determiner_travailleur_pour(const Stockage* store, int id_spe) {
 		if (store->travailleurs.table[id_worker].tag_specialite[id_spe] == VRAI) {
 			if (lowestHours < 0) {
 				lowestHours = totalWorker[id_worker];
+				retval = id_worker;
 			}
 
 			if (EchoActif)
 				printf(">>> >>> %s %d: %d (%d)\n", store->travailleurs.table[id_worker].nom, id_worker, totalWorker[id_worker], lowestHours);
-			if (lowestHours >= totalWorker[id_worker]) {
+			if (lowestHours > totalWorker[id_worker]) {
 				retval = id_worker;
 				lowestHours = totalWorker[id_worker];
 			}
@@ -661,7 +664,7 @@ char determiner_travailleur_pour(const Stockage* store, int id_spe) {
 
 /*
 * traite_tache() || CF. prototype pour la doc de cette fonction
-* 
+*
 * tache <Mot commande> <Mot specialite> <int heures>
 * Ajoute une specialité ainsi que le nombre d'heures requises à une commande
 */
@@ -681,7 +684,8 @@ void traite_tache(Stockage* store) {
 	if (id_worker < TRAVAILLEURS_SIZE) {
 		store->commandes.table[cmd_i].en_charge_tache[id_spe] = id_worker;
 		// store->travailleurs.table[id_worker].heuresRealises += heures;
-	} else if(EchoActif) {
+	}
+	else if (EchoActif) {
 		printf("$ Erreur : aucun travailleur trouvé pour traiter la spécialité demandée.\n");
 	}
 	// Il sera nécessaire de stoker le nombre de [tâches||d'heures] au bout d'une
@@ -693,7 +697,7 @@ void traite_tache(Stockage* store) {
 
 /*
 * traite_charge() || CF. prototype pour la doc de cette fonction
-* 
+*
 * charge <Mot nom_travailleur>
 */
 void traite_charge(const Stockage* store) {
@@ -717,12 +721,13 @@ void traite_charge(const Stockage* store) {
 
 				if (isFirstTime) {
 					isFirstTime = FAUX;
-				} else {
+				}
+				else {
 					printf(", ");
 				}
 
-				printf("%s/%s/%dheure(s)", store->commandes.table[commandesI], store->specialites.table[specialitesI].nom, tache.nb_heures_requises - tache.nb_heures_effectuees);
-				
+				printf("%s/%s/%dheure(s)", store->commandes.table[commandesI].produit, store->specialites.table[specialitesI].nom, tache.nb_heures_requises - tache.nb_heures_effectuees);
+
 			}
 		}
 	}
@@ -770,7 +775,7 @@ Booleen verif_facturationsGlobales(const Stockage* store) {
 
 /*
 * traite_progression() || CF. prototype pour la doc de cette fonction
-* 
+*
 * entrée utilisateur attendue tache : <Mot produit> <Mot specialite> <int heures_travaillees>
 * Donné le nom d'une commande, et le nom de la spécialité à mettre à jour, modifie son nombre d'heures travaillées
 */
@@ -786,6 +791,7 @@ Booleen traite_progression(Stockage* store) {
 
 	store->lastCommande = cmd_i;
 	store->lastSpecialite = id_spe;
+	store->lastProgression = heures_travaillees;
 
 	Booleen checkFacturation = verif_facturation(store, cmd_i);
 	if (checkFacturation && store->commandes.table[cmd_i].complete == FAUX) {
@@ -814,7 +820,7 @@ Booleen traite_progression(Stockage* store) {
 		for (int client = 0; client < store->clients.inserted; ++client) {
 			Gros_entier cout_total_client = 0;
 			for (int commande = 0; commande < store->commandes.inserted; ++commande) {
-				if(strcmp(store->commandes.table[commande].nom_client, store->clients.table[client].nom) == 0) {
+				if (strcmp(store->commandes.table[commande].nom_client, store->clients.table[client].nom) == 0) {
 					for (int spec = 0; spec < SPECIALITE_SIZE; ++spec) {
 						Tache tacheCourante = store->commandes.table[commande].liste_taches[spec];
 						cout_total_client += tacheCourante.nb_heures_effectuees * store->specialites.table[spec].cout_horaire;
@@ -838,14 +844,14 @@ Booleen traite_progression(Stockage* store) {
 
 /*
 * traite_passe() || CF. prototype pour la doc de cette fonction
-* 
+*
 * entrée utilisateur attendue : passe
 * réaffecte un nouveau travailleur pour la dernière tâche passée en argument de l'instruction progression
 */
 void traite_passe(Stockage* store) {
 	if (store->lastCommande && store->lastSpecialite) {
-		if(EchoActif)
-			printf(">>> commande: %d / specialite: %d / worker actuel: %d \n", store->lastCommande,store-> lastSpecialite, store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite]);
+		if (EchoActif)
+			printf(">>> commande: %d / specialite: %d / worker actuel: %d \n", store->lastCommande, store->lastSpecialite, store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite]);
 		const unsigned int id_worker = determiner_travailleur_pour(store, store->lastSpecialite);
 
 		store->commandes.table[store->lastCommande].en_charge_tache[store->lastSpecialite] = id_worker;
