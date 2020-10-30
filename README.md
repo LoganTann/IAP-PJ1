@@ -1,18 +1,28 @@
 # IAP - PJ1
-> <img src="https://www.iut.parisdescartes.fr/wp-content/uploads/sites/3/2020/10/UniversiteParis_IUTParis-RdS.png" width="400px">
->
-> Introduction à l'Algorithmique et à la Programmation, Projet de la période A, Semestre 1/4  
-> *--- Système de gestion d'une entreprise ---*
->
-> **Antoine Banha** @JiveOff, groupe 102  
-> **Logan TANN** @LoganTann, groupe 102
+<table>
+<tr><td>
+      
+<img src="https://www.iut.parisdescartes.fr/wp-content/uploads/sites/3/2020/10/UniversiteParis_IUTParis-RdS.png" width="400px">
 
+Introduction à l'Algorithmique et à la Programmation (IAP)  
+Projet de la période A, Semestre 1  
+*--- Système de gestion d'une entreprise ---*
+
+</td><td>
+  
 Outils utilisés :
 ![Visual Studio 2019](https://i.ibb.co/W0Zps9V/visual-Studio.png) +
 ![Live Share](https://i.ibb.co/GFHxLyx/liveshare.png) +
 ![Discord](https://i.ibb.co/pQ2X345/07dca80a102d4149e9736d4b162cff6f.png) +
 ![GitHub](https://i.ibb.co/7SwLgYW/favicon.png) +
 ![Libre Office](https://fr.libreoffice.org/themes/libreofficenew/favicon.ico)
+
+**Antoine Banha** [@JiveOff](https://github.com/JiveOff/), groupe 102  
+**Logan TANN** [@LoganTann](https://github.com/LoganTann/) , groupe 102
+
+</td></tr></table>
+
+
 
 ## Niveau de difficulté passé en soutenance : sprint <u>6-r</u> / 6-r
 
