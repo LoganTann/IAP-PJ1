@@ -2,7 +2,7 @@
     sprint.c
     ---------------------------------------------------------------- 80 chars ->
     @author JiveOff (Antoine Banha - antoine@jiveoff.fr)
-    @author ShinProg (Logan Tann - logon313@hotmail.fr)
+    @author ShinProg (Logan Tann - logan@kagescan.fr)
 */
 
 
@@ -179,7 +179,7 @@ int getIndex_cmd(const Commandes* commandes, Mot nom_produit);
 int getIndex_trv(const Travailleurs* travailleurs, Mot nom);
 
 /**
-* [brief] : Trouve et retourne l'entier n tel que Specialites->table[n].nom 
+* [brief] : Trouve et retourne l'entier n tel que Specialites->table[n].nom
 *           (in1) est égal à nom (in2)
 * specialites [in]: Pointeur constant d'une struct de type Specialites.
 *                   Spécifie la struct dans laquelle on va chercher.
@@ -988,14 +988,14 @@ Booleen traite_progression(Stockage* store) {
             for (int id_cmd = 0; id_cmd < store->commandes.inserted; ++id_cmd) {
                 Commande* current_cmd = &store->commandes.table[id_cmd];
 
-                // ... et si celui-ci est bien en charge de cette commande, 
+                // ... et si celui-ci est bien en charge de cette commande,
                 // regarder chaque tache ...
                 if (strcmp(current_cmd->nom_client, *nom_de_ce_client) == 0) {
                     for (int spec = 0; spec < SPECIALITE_SIZE; ++spec) {
                         Tache tacheCourante = current_cmd->liste_taches[spec];
 
                         // puis mettre à jour le coût total du client en fon-
-                        // ction de son nombre d'heures effectuées et du coût 
+                        // ction de son nombre d'heures effectuées et du coût
                         // horairede la spé
                         cout_total_client += (
                             tacheCourante.nb_heures_effectuees
