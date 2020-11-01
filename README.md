@@ -32,14 +32,14 @@ Outils utilisés :
 * out du sprint 6r de référence : [docs/out6.release.txt](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/docs/out6.release.txt)
 * In du sprint 6r de la soutenance : [docs/in6-final.txt](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/docs/in6-final.txt)
 * out du sprint 6r de référence : [docs/out6-final.txt](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/docs/out6-final.txt)
-* Lien vers le PDF de notre rapport : [*à venir ...*](#!)
-* Lien vers le ZIP déposé dans le puit : [*à venir ...*](#!)
+* Lien vers le PDF de notre rapport : [Rapport.pdf](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/Rapport.pdf)
+* ZIP : contient le [sprint.c](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/sprint.c) et le [Rapport.pdf](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/Rapport.pdf), intuile pour nous d'uploader le zip
 
 ### Notation et critères de qualité (??/20) :
 
 
 - [x] Tests end-to-end du sprint 6r (via les in/outs) en soutenance : `16/16`
-- [ ] Qualité globale du code : (`??/2`)  *- en attente de notation -*
+- [x] Qualité globale du code : (`??/2`)  *- en attente de notation -*
   - [x] Code parfaitement indenté
   - [x] Prototypage des fonction
   - [x] Documentation des fonctions
@@ -49,9 +49,9 @@ Outils utilisés :
   - [x] Lisibilité du code (noms de variables et de fonctions ont une significaiton)
 - [x] Dossier : (`??/2`) *- en attente de notation -*
   - [x] page de garde + nom et groupe des participants
-  - [ ] présentation du pb *- partie notée, en attente de notation -*
-  - [ ] preuve de validation : capture écran des diff de chaque étape.
-  - [ ] bilan du projet
+  - [x] présentation du pb *- partie notée, en attente de notation -*
+  - [x] preuve de validation : capture écran des diff de chaque étape.
+  - [x] bilan du projet
   - [x] Code complet du dernier sprint réalisé
   - [x] Code source de tous les sprints réalisés (Non inclus, ce github fourni à la place. Liens des raws plus bas.)
 
@@ -61,12 +61,14 @@ Outils utilisés :
 
 ## Notes
 * Le projet a été fait avec le live-share de Visual Studio. Les commits et leurs contenus ne sont généralement pas représentatifs du travail de leurs auteurs, mais permettent plutôt de représenter les périodes de travail de groupe.
-* Pour des raisons de lisibilité dans le rapport, les tabs ont été converties en 4 spaces.
+* Pour des raisons de lisibilité dans le rapport, les tabs ont été converties en 4 spaces dans la branche sprint6-r-refactor
 
 ## Code des autres sprints :
 CF. branches de ce repository.  
 Il est possible que les anciens sprints contiennent des bugs qui auraient été
 corrigés au cours de l'évolution des sprints.
+
+Il est également possible que le code dans les releases diffèrent du code fourni dans le rapport et les dernières en date dans les branches
 
 * [sprint 0](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/master/sprint.c)
 * [sprint 1-a](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint1-a/sprint.c)
