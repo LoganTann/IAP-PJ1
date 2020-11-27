@@ -1,4 +1,5 @@
-# IAP - PJ1
+# Project archived since we got the final score of the homework. Please contact us using our github e-mail if needed.
+
 <table>
 <tr><td>
       
@@ -59,7 +60,7 @@ Outils utilisés :
 *Retard dans le rapport : `-3 points/20 x nombre de jours de retard`.*  
 *Partie.s manquante.s dans le rapport : `-1 points/20 x nombre de parties`.*
 
-## Notes
+## Remarques
 * Le projet a été fait avec le live-share de Visual Studio. Les commits et leurs contenus ne sont généralement pas représentatifs du travail de leurs auteurs, mais permettent plutôt de représenter les périodes de travail de groupe.
 * Pour des raisons de lisibilité dans le rapport, les tabs ont été converties en 4 spaces dans la branche sprint6-r-refactor
 
@@ -76,5 +77,5 @@ Il est également possible que le code dans les releases diffèrent du code four
 * [sprint 1-r](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint1-r/sprint.c)
 * [sprint 3-a](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint3-a/sprint.c)
 * [sprint 4-a](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint4-a/sprint.c)
-* [sprint 6-r présenté en soutenance](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r/sprint.c)
-* [**sprint 6-r avec refactorisation (cette branche)**](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/sprint.c)
+* [sprint 6-r présenté en soutenance](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r/sprint.c) (garanti fonctionnel)
+* [**sprint 6-r avec refactorisation (cette branche)**](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/sprint.c) (peut ne pas fonctionner)
