@@ -35,11 +35,11 @@ Outils utilisés :
 * Lien vers le PDF de notre rapport : [Rapport.pdf](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/Rapport.pdf)
 * ZIP : contient le [sprint.c](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/sprint.c) et le [Rapport.pdf](https://raw.githubusercontent.com/LoganTann/IAP-PJ1/sprint6-r-refactor/Rapport.pdf), intuile pour nous d'uploader le zip
 
-### Notation et critères de qualité (??/20) :
+### Notation et critères de qualité (note obtenue : 20/20) :
 
 
 - [x] Tests end-to-end du sprint 6r (via les in/outs) en soutenance : `16/16`
-- [x] Qualité globale du code : (`??/2`)  *- en attente de notation -*
+- [x] Qualité globale du code : (`2/2`) 
   - [x] Code parfaitement indenté
   - [x] Prototypage des fonction
   - [x] Documentation des fonctions
@@ -47,9 +47,9 @@ Outils utilisés :
   - [x] Respect de la limite des 80 caractères par ligne
   - [x] Tests unitaires (via les asserts)
   - [x] Lisibilité du code (noms de variables et de fonctions ont une significaiton)
-- [x] Dossier : (`??/2`) *- en attente de notation -*
+- [x] Dossier : (`2/2`) 
   - [x] page de garde + nom et groupe des participants
-  - [x] présentation du pb *- partie notée, en attente de notation -*
+  - [x] présentation du pb
   - [x] preuve de validation : capture écran des diff de chaque étape.
   - [x] bilan du projet
   - [x] Code complet du dernier sprint réalisé
